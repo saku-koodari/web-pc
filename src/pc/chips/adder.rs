@@ -10,9 +10,9 @@ pub fn full_adder(a: bool, b: bool, c: bool) -> (bool, bool) {
     (sum2, or(carry1, carry2))
 }
 
-pub fn adder_rca_lsb_b16(a: [bool; 16], b: [bool; 16], cin: bool) -> ([bool; 16], bool) {
+pub fn adder_rca_lsb_b16(a: [bool; 16], b: [bool; 16]) -> ([bool; 16], bool) {
     // bit order here is LSB
-    let (sum00, c01) = full_adder(a[0], b[0], cin);
+    let (sum00, c01) = half_adder(a[0], b[0]);
     let (sum01, c02) = full_adder(a[1], b[1], c01);
     let (sum02, c03) = full_adder(a[2], b[2], c02);
     let (sum03, c04) = full_adder(a[3], b[3], c03);
@@ -44,8 +44,7 @@ pub fn inc16(input: [bool; 16]) -> [bool; 16] {
         [
             true, false, false, false, false, false, false, false, false, false, false, false,
             false, false, false, false,
-        ],
-        false,
+        ]
     );
     sum
 }
@@ -217,7 +216,7 @@ mod tests {
             print!("\ntesting {n}...\n", n = case.n);
 
             // act
-            let (res, overflow) = adder_rca_lsb_b16(case.a, case.b, false);
+            let (res, overflow) = adder_rca_lsb_b16(case.a, case.b);
 
             // debug
             print!(
