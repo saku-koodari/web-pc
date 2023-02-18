@@ -96,9 +96,9 @@ impl eframe::App for TemplateApp {
             // The central panel the region left after adding TopPanel's and SidePanel's
 
             ui.heading("eframe template");
-            ui.hyperlink("https://github.com/emilk/eframe_template");
+            ui.hyperlink("https://github.com/saku-kaarakainen/web-pc");
             ui.add(egui::github_link_file!(
-                "https://github.com/emilk/eframe_template/blob/master/",
+                "https://github.com/saku-kaarakainen/web-pc/blob/main/",
                 "Source code."
             ));
             egui::warn_if_debug_build(ui);
