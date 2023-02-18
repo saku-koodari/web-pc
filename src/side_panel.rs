@@ -24,9 +24,4 @@ pub fn side_panel(ui: &mut egui::Ui, label: &mut String, value: &mut f32, frame:
             ui.label(".");
         });
     });
-
-    #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
-    egui::Button::new("Quit").on_click(move |_| {
-        frame.close();
-    }).ui(ui);
 }
