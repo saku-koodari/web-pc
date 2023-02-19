@@ -154,7 +154,15 @@ pub fn xnor16(a: [bool; 16], b: [bool; 16]) -> [bool; 16] {
     ]
 }
 
-/// 16-bit  MUX Gate
+/// 16-bit MUX Gate. if sel is `true`, return `b`, else return `a`
+///
+/// ## Arguments
+/// * `a` - first input
+/// * `b` - second input
+/// * `sel` - selector
+///
+/// ## Returns
+/// * `bool` - output, either `a` or `b`
 pub fn mux16(a: [bool; 16], b: [bool; 16], sel: bool) -> [bool; 16] {
     [
         mux(a[0], b[0], sel),
@@ -253,7 +261,7 @@ mod tests {
     #[test]
     fn test_xor() {
         use crate::utils::constants::{B16_FALSE, B16_TRUE};
-        
+
         assert_eq!(xor16(B16_TRUE, B16_TRUE), B16_FALSE);
         assert_eq!(xor16(B16_TRUE, B16_FALSE), B16_TRUE);
         assert_eq!(xor16(B16_FALSE, B16_TRUE), B16_TRUE);
