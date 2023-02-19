@@ -1,10 +1,9 @@
 use crate::pc::gates::gates_b1::and;
-use crate::side_panel;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
-pub struct TemplateApp {
+pub struct GuiApp {
     // Example stuff:
     label: String,
 
@@ -13,7 +12,7 @@ pub struct TemplateApp {
     value: f32,
 }
 
-impl Default for TemplateApp {
+impl Default for GuiApp {
     fn default() -> Self {
         Self {
             // Example stuff:
@@ -23,7 +22,7 @@ impl Default for TemplateApp {
     }
 }
 
-impl TemplateApp {
+impl GuiApp {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // This is also where you can customize the look and feel of egui using
@@ -39,7 +38,7 @@ impl TemplateApp {
     }
 }
 
-impl eframe::App for TemplateApp {
+impl eframe::App for GuiApp {
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);
@@ -81,7 +80,45 @@ impl eframe::App for TemplateApp {
         });
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
-            side_panel::side_panel(ui, &mut self.label, &mut self.value, _frame);
+            use egui::{menu, Button};
+            ui.heading("Tools");
+            ui.label("Chips: 16-bit Adder");
+
+            //this is a textbox
+            let mut input_a = String::from("1");
+            let mut input_b = String::from("2");
+            ui.horizontal(|ui| {
+                ui.label("a:");
+                ui.text_edit_singleline(&mut input_a);
+            });
+
+            ui.horizontal(|ui| {
+                ui.label("b:");
+                ui.text_edit_singleline(&mut input_b);
+            });
+
+            ui.horizontal(|ui| {
+                ui.label("out:");
+                ui.text_edit_singleline(&mut input_b);
+            });
+
+            // this is a slider
+            // ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
+
+            // this is a button
+            // if ui.button("Increment").clicked() {
+            //     *value += 1.0;
+            // }
+
+            // this is a footer
+            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
+                ui.horizontal(|ui| {
+                    ui.spacing_mut().item_spacing.x = 0.0;
+                    ui.label("The source on ");
+                    ui.hyperlink_to("github", "https://github.com/saku-kaarakainen/web-pc");
+                    ui.label(".");
+                });
+            });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
