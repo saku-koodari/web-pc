@@ -58,8 +58,8 @@ pub fn panelAlu(
                 let output_b16 =
                     crate::pc::chips::adder::adder_rca_lsb_b16(a.bin_array, b.bin_array);
 
-                let output_i32 = utils::convert::b16_to_int_lsb(output_b16.0);
-                data.output = output_i32.to_string();
+                let output_i16 = utils::convert::b16_to_i16(output_b16.0);
+                data.output = output_i16.to_string();
 
                 if output_b16.1 {
                     data.error = "Overflow!".to_owned();

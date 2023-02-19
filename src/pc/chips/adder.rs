@@ -87,53 +87,35 @@ mod tests {
     fn test_adder_rca_b16() {
         use crate::{
             pc::chips::adder::adder_rca_lsb_b16,
-            utils::convert::{b16_to_int_lsb, int_to_b16_lsb},
+            utils::convert::{b16_to_i16, i16_to_b16},
         };
 
         // arrange
         let test_cases = vec![
             Atc {
-                a: int_to_b16_lsb(0),
-                b: int_to_b16_lsb(0),
-                o: int_to_b16_lsb(0),
+                a: i16_to_b16(0),
+                b: i16_to_b16(0),
+                o: i16_to_b16(0),
                 n: String::from("test 1: 0 + 0 = 0"),
             },
             Atc {
-                a: int_to_b16_lsb(0),
-                b: int_to_b16_lsb(1),
-                o: int_to_b16_lsb(1),
-                n: String::from("test 2: 0 + 1 = 1"),
-            },
-            Atc {
-                a: int_to_b16_lsb(1),
-                b: int_to_b16_lsb(1),
-                o: int_to_b16_lsb(2),
-                n: String::from("test 3: 1 + 1 = 2"),
-            },
-            Atc {
-                a: int_to_b16_lsb(1),
-                b: int_to_b16_lsb(2),
-                o: int_to_b16_lsb(3),
+                a: i16_to_b16(1),
+                b: i16_to_b16(2),
+                o: i16_to_b16(3),
                 n: String::from("test 4: 1 + 2 = 3"),
             },
             Atc {
-                a: int_to_b16_lsb(8),
-                b: int_to_b16_lsb(8),
-                o: int_to_b16_lsb(16),
-                n: String::from("test 5: 8 + 8 = 16"),
+                a: i16_to_b16(5),
+                b: i16_to_b16(-3),
+                o: i16_to_b16(2),
+                n: String::from("test 5: 5 - 3 = 2"),
             },
             Atc {
-                a: int_to_b16_lsb(999),
-                b: int_to_b16_lsb(7777),
-                o: int_to_b16_lsb(8776),
-                n: String::from("test 6: 999 + 7777 = 8776"),
-            },
-            Atc {
-                a: int_to_b16_lsb(16384),
-                b: int_to_b16_lsb(49151),
-                o: int_to_b16_lsb(65535),
-                n: String::from("test 7: 16384 + 49151 = 65535"),
-            },
+                a: i16_to_b16(0),
+                b: i16_to_b16(-100),
+                o: i16_to_b16(-100),
+                n: String::from("test 6: 0 - 100 = -100"),
+            }
         ];
 
         for case in test_cases {
@@ -145,8 +127,8 @@ mod tests {
             // debug
             print!(
                 "expected: {o}. actual: {res}.\n",
-                o = b16_to_int_lsb(case.o),
-                res = b16_to_int_lsb(res)
+                o = b16_to_i16(case.o),
+                res = b16_to_i16(res)
             );
 
             // assert

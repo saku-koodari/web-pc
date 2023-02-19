@@ -25,7 +25,7 @@ pub fn from_string(str: &str) -> Result<ConvertResult, String> {
 
     let int_value = int_value_res.unwrap();
     let hex_string = format!("{:04X}", int_value);
-    let bin_array = i16_to_b16_lsb(int_value);
+    let bin_array = i16_to_b16(int_value);
     let bin_array_as_string = format!("{:016b}", int_value);
     Ok(ConvertResult {
         int_value,
@@ -36,7 +36,7 @@ pub fn from_string(str: &str) -> Result<ConvertResult, String> {
 }
 
 pub fn from_b16(b16: [bool; 16]) -> ConvertResult {
-    let int_value = b16_to_i16_lsb(b16);
+    let int_value = b16_to_i16(b16);
     let hex_string = format!("{:04X}", int_value);
     let bin_array_as_string = format!("{:016b}", int_value);
     ConvertResult {
@@ -48,18 +48,7 @@ pub fn from_b16(b16: [bool; 16]) -> ConvertResult {
 }
 
 /// Converts a 16-bit array to an integer, LSB first.
-pub fn b16_to_int_lsb(b16: [bool; 16]) -> i32 {
-    let mut res: i32 = 0;
-    for (i, &bit) in b16.iter().enumerate() {
-        if bit {
-            let _ = res += 1 << i;
-        }
-    }
-    res
-}
-
-/// Converts a 16-bit array to an integer, LSB first.
-pub fn b16_to_i16_lsb(b16: [bool; 16]) -> i16 {
+pub fn b16_to_i16(b16: [bool; 16]) -> i16 {
     let mut res: i16 = 0;
     for (i, &bit) in b16.iter().enumerate() {
         if bit {
@@ -70,20 +59,7 @@ pub fn b16_to_i16_lsb(b16: [bool; 16]) -> i16 {
 }
 
 /// Converts an 32-bit integer to a 16-bit array, LSB first.
-pub fn int_to_b16_lsb(n: i32) -> [bool; 16] {
-    let mut b16 = [false; 16];
-    let mut quotient = n;
-    let mut index = 0;
-    while quotient > 0 {
-        b16[index] = quotient % 2 == 1;
-        quotient /= 2;
-        index += 1;
-    }
-    b16
-}
-
-/// Converts an 32-bit integer to a 16-bit array, LSB first.
-pub fn i16_to_b16_lsb(n: i16) -> [bool; 16] {
+pub fn i16_to_b16(n: i16) -> [bool; 16] {
     let mut b16 = [false; 16];
     let mut quotient = n;
     let mut index = 0;
@@ -99,39 +75,43 @@ mod tests {
     #[test]
     fn test_internal_int_to_b16() {
         use crate::utils::{
-            constants::{
-                B16_LSB_0, B16_LSB_1, B16_LSB_2, B16_LSB_3, B16_LSB_43690, B16_LSB_65534,
-                B16_LSB_65535,
+            constants::i16_consts::{
+                B16_0, B16_MINUS_1, B16_MINUS_2, B16_MINUS_21845, B16_MINUS_32768, B16_PLUS_1,
+                B16_PLUS_2, B16_PLUS_21845, B16_PLUS_32767,
             },
-            convert::int_to_b16_lsb,
+            convert::i16_to_b16,
         };
 
-        assert_eq!(int_to_b16_lsb(0), B16_LSB_0);
-        assert_eq!(int_to_b16_lsb(1), B16_LSB_1);
-        assert_eq!(int_to_b16_lsb(2), B16_LSB_2);
-        assert_eq!(int_to_b16_lsb(3), B16_LSB_3);
-        assert_eq!(int_to_b16_lsb(43690), B16_LSB_43690);
-        assert_eq!(int_to_b16_lsb(65534), B16_LSB_65534);
-        assert_eq!(int_to_b16_lsb(65535), B16_LSB_65535);
+        assert_eq!(i16_to_b16(0), B16_0);
+        assert_eq!(i16_to_b16(1), B16_PLUS_1);
+        assert_eq!(i16_to_b16(-1), B16_MINUS_1);
+        assert_eq!(i16_to_b16(2), B16_PLUS_2);
+        assert_eq!(i16_to_b16(-2), B16_MINUS_2);
+        assert_eq!(i16_to_b16(21845), B16_PLUS_21845);
+        assert_eq!(i16_to_b16(-21845), B16_MINUS_21845);
+        assert_eq!(i16_to_b16(32767), B16_PLUS_32767);
+        assert_eq!(i16_to_b16(-32768), B16_MINUS_32768);
     }
 
     #[test]
     fn test_internal_b16_to_int() {
         use crate::utils::{
-            constants::{
-                B16_LSB_0, B16_LSB_1, B16_LSB_2, B16_LSB_3, B16_LSB_43690, B16_LSB_65534,
-                B16_LSB_65535,
+            constants::i16_consts::{
+                B16_0, B16_MINUS_1, B16_MINUS_2, B16_MINUS_21845, B16_MINUS_32768, B16_PLUS_1,
+                B16_PLUS_2, B16_PLUS_21845, B16_PLUS_32767,
             },
-            convert::b16_to_int_lsb,
+            convert::b16_to_i16,
         };
 
-        assert_eq!(b16_to_int_lsb(B16_LSB_0), 0);
-        assert_eq!(b16_to_int_lsb(B16_LSB_1), 1);
-        assert_eq!(b16_to_int_lsb(B16_LSB_2), 2);
-        assert_eq!(b16_to_int_lsb(B16_LSB_3), 3);
-        assert_eq!(b16_to_int_lsb(B16_LSB_43690), 43690);
-        assert_eq!(b16_to_int_lsb(B16_LSB_65534), 65534);
-        assert_eq!(b16_to_int_lsb(B16_LSB_65535), 65535);
+        assert_eq!(b16_to_i16(B16_0), 0);
+        assert_eq!(b16_to_i16(B16_PLUS_1), 1);
+        assert_eq!(b16_to_i16(B16_PLUS_2), 2);
+        assert_eq!(b16_to_i16(B16_PLUS_21845), 21845);
+        assert_eq!(b16_to_i16(B16_PLUS_32767), 32767);
+        assert_eq!(b16_to_i16(B16_MINUS_32768), -32768);
+        assert_eq!(b16_to_i16(B16_MINUS_21845), 21845);
+        assert_eq!(b16_to_i16(B16_MINUS_2), 2);
+        assert_eq!(b16_to_i16(B16_MINUS_1), 1);
     }
 
     // test cases for from_string
@@ -147,27 +127,27 @@ mod tests {
 
     #[test]
     fn test_from_string() {
-        use crate::utils::convert::from_string;
+        use crate::utils::{
+            constants::i16_consts::{B16_0, B16_PLUS_1},
+            convert::from_string,
+        };
 
         let test_cases: Vec<TestCasesFromString> = vec![
-            {
-                TestCasesFromString {
-                    string_input: "0".to_string(),
-                    int_value: 0,
-                    hex_string: "0000".to_string(),
-                    bin_array: [false; 16],
-                    bin_array_as_string: "0000000000000000".to_string(),
-                    is_err: false,
-                },
-                TestCasesFromString {
-                    string_input: "1".to_string(),
-                    int_value: 1,
-                    hex_string: "0001".to_string(),
-                    bin_array: B16_LSB_1
-                    bin_array_as_string: "0000000000000001".to_string(),
-                    is_err: false,
-                }
-
+            TestCasesFromString {
+                string_input: "0".to_string(),
+                int_value: 0,
+                hex_string: "0000".to_string(),
+                bin_array: B16_0,
+                bin_array_as_string: "0000000000000000".to_string(),
+                is_err: false,
+            },
+            TestCasesFromString {
+                string_input: "1".to_string(),
+                int_value: 1,
+                hex_string: "0001".to_string(),
+                bin_array: B16_PLUS_1,
+                bin_array_as_string: "0000000000000001".to_string(),
+                is_err: false,
             },
         ];
 
@@ -190,35 +170,20 @@ mod tests {
     #[test]
     fn test_from_b16() {
         use crate::utils::{
-            constants::{
-                B16_LSB_0, B16_LSB_1, B16_LSB_2, B16_LSB_3, B16_LSB_43690, B16_LSB_65534,
-                B16_LSB_65535,
-            },
+            constants::i16_consts::{B16_0, B16_PLUS_1},
             convert::from_b16,
         };
 
-        let res = from_b16(B16_LSB_0);
+        let res = from_b16(B16_0);
         assert_eq!(res.int_value, 0);
         assert_eq!(res.hex_string, "0000");
-        assert_eq!(res.bin_array, B16_LSB_0);
+        assert_eq!(res.bin_array, B16_0);
         assert_eq!(res.bin_array_as_string, "0000000000000000");
 
-        let res = from_b16(B16_LSB_1);
+        let res = from_b16(B16_PLUS_1);
         assert_eq!(res.int_value, 1);
         assert_eq!(res.hex_string, "0001");
-        assert_eq!(res.bin_array, B16_LSB_1);
+        assert_eq!(res.bin_array, B16_PLUS_1);
         assert_eq!(res.bin_array_as_string, "0000000000000001");
-
-        let res = from_b16(B16_LSB_2);
-        assert_eq!(res.int_value, 2);
-        assert_eq!(res.hex_string, "0002");
-        assert_eq!(res.bin_array, B16_LSB_2);
-        assert_eq!(res.bin_array_as_string, "0000000000000010");
-
-        let res = from_b16(B16_LSB_3);
-        assert_eq!(res.int_value, 3);
-        assert_eq!(res.hex_string, "0003");
-        assert_eq!(res.bin_array, B16_LSB_3);
-        assert_eq!(res.bin_array_as_string, "0000000000000011");
     }
 }
