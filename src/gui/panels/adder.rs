@@ -1,4 +1,4 @@
-use crate::utils::{self, convert::str_to_b16_lsb};
+use crate::utils::{self, convert::from_string};
 
 pub struct AdderData {
     // TODO: Is it possible to convert into i32?
@@ -20,6 +20,7 @@ impl Default for AdderData {
 }
 
 pub fn panelAdder(
+    // ctx: &mut Context,
     ui: &mut egui::Ui,
     label: &mut String,
     data: &mut AdderData,
@@ -37,18 +38,16 @@ pub fn panelAdder(
     });
 
     if ui.button("Calculate").clicked() {
-        let result =
-            str_to_b16_lsb(&data.input_a).and_then(|a| {
-            str_to_b16_lsb(&data.input_b).map(|b| (a, b))
-        });
-    
+        let result = from_string(&data.input_a)
+            .and_then(|a| from_string(&data.input_b).map(|b| (a.bin_array, b.bin_array)));
+
         match result {
             Ok((a, b)) => {
                 let output_b16 = crate::pc::chips::adder::adder_rca_lsb_b16(a, b);
 
-                let output_i32 = utils::convert::b16_to_int_lsb(output_b16.0);
+                let output_i32 = utils::convert::from_b16(output_b16.0);
                 data.output = output_i32.to_string();
-        
+
                 if output_b16.1 {
                     data.error = "Overflow!".to_owned();
                 } else {
@@ -59,7 +58,7 @@ pub fn panelAdder(
                 data.error = e;
                 return;
             }
-        }  
+        }
     }
 
     ui.horizontal(|ui| {

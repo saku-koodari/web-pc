@@ -1,4 +1,4 @@
-use crate::utils::{self, convert::str_to_b16_lsb};
+use crate::utils::{self, convert::from_string};
 
 pub struct AluData {
     // TODO: Is it possible to convert into i32?
@@ -29,29 +29,34 @@ impl Default for AluData {
 }
 
 pub fn panelAlu(
+    // ctx: &mut Context,
     ui: &mut egui::Ui,
     label: &mut String,
     data: &mut AluData,
     frame: &mut eframe::Frame,
 ) {
-    ui.label("16-bit Adder");
+    let input_a = &mut data.input_a;
+    let input_b = &mut data.input_b;
+    let output = &mut data.output;
+
+    ui.label("16-bit ALU");
     ui.horizontal(|ui| {
         ui.label("Input A:");
-        ui.add(egui::widgets::TextEdit::singleline(&mut data.input_a));
+        ui.add(egui::widgets::TextEdit::singleline(input_a));
     });
 
     ui.horizontal(|ui| {
         ui.label("Input B:");
-        ui.add(egui::widgets::TextEdit::singleline(&mut data.input_b));
+        ui.add(egui::widgets::TextEdit::singleline(input_b));
     });
 
     if ui.button("Run").clicked() {
-        let result = str_to_b16_lsb(&data.input_a)
-            .and_then(|a| str_to_b16_lsb(&data.input_b).map(|b| (a, b)));
+        let result = from_string(input_a).and_then(|a| from_string(input_b).map(|b| (a, b)));
 
         match result {
             Ok((a, b)) => {
-                let output_b16 = crate::pc::chips::adder::adder_rca_lsb_b16(a, b);
+                let output_b16 =
+                    crate::pc::chips::adder::adder_rca_lsb_b16(a.bin_array, b.bin_array);
 
                 let output_i32 = utils::convert::b16_to_int_lsb(output_b16.0);
                 data.output = output_i32.to_string();

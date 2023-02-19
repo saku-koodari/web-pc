@@ -1,6 +1,7 @@
 use super::panels::{
     adder::{panelAdder, AdderData},
     alu::{panelAlu, AluData},
+    not::{panelNot, NotData},
 };
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
@@ -19,6 +20,9 @@ pub struct GuiApp {
 
     #[serde(skip)]
     aluData: AluData,
+
+    #[serde(skip)]
+    notData: NotData,
 }
 
 impl Default for GuiApp {
@@ -29,6 +33,7 @@ impl Default for GuiApp {
             value: 2.7,
             adderData: AdderData::default(),
             aluData: AluData::default(),
+            notData: NotData::default(),
         }
     }
 }
@@ -63,6 +68,7 @@ impl eframe::App for GuiApp {
             value,
             adderData,
             aluData,
+            notData,
         } = self;
 
         // Examples of how to create different panels and windows.
@@ -96,8 +102,9 @@ impl eframe::App for GuiApp {
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.heading("Tools");
 
-            panelAdder(ui, label, adderData, _frame);
-            panelAlu(ui, label, aluData, _frame);
+            panelNot(&ctx, ui, label, notData, _frame);
+            panelAdder(/*ctx,*/ ui, label, adderData, _frame);
+            panelAlu(/*ctx,*/ ui, label, aluData, _frame);
 
             // this is a slider
             // ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
