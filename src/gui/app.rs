@@ -1,5 +1,7 @@
 use crate::pc::gates::gates_b1::and;
 
+use super::panels::adder::{panelAdder, AdderData};
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -10,14 +12,18 @@ pub struct GuiApp {
     // this how you opt-out of serialization of a member
     #[serde(skip)]
     value: f32,
+
+    #[serde(skip)]
+    adderData: AdderData,
 }
 
 impl Default for GuiApp {
     fn default() -> Self {
         Self {
             // Example stuff:
-            label: "Hello World!".to_owned(),
+            label: "My virtual PC".to_owned(),
             value: 2.7,
+            adderData: AdderData::default(),
         }
     }
 }
@@ -47,7 +53,11 @@ impl eframe::App for GuiApp {
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let Self { label, value } = self;
+        let Self {
+            label,
+            value,
+            adderData,
+        } = self;
 
         // Examples of how to create different panels and windows.
         // Pick whichever suits you.
@@ -63,8 +73,6 @@ impl eframe::App for GuiApp {
                     }
                 });
             });
-
-            let _ = and(true, true);
         });
 
         #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
@@ -80,27 +88,9 @@ impl eframe::App for GuiApp {
         });
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
-            use egui::{menu, Button};
             ui.heading("Tools");
-            ui.label("Chips: 16-bit Adder");
-
-            //this is a textbox
-            let mut input_a = String::from("1");
-            let mut input_b = String::from("2");
-            ui.horizontal(|ui| {
-                ui.label("a:");
-                ui.text_edit_singleline(&mut input_a);
-            });
-
-            ui.horizontal(|ui| {
-                ui.label("b:");
-                ui.text_edit_singleline(&mut input_b);
-            });
-
-            ui.horizontal(|ui| {
-                ui.label("out:");
-                ui.text_edit_singleline(&mut input_b);
-            });
+            
+            panelAdder(ui, label, adderData, _frame);
 
             // this is a slider
             // ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));

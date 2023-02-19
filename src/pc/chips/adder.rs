@@ -42,102 +42,20 @@ pub fn inc16(input: [bool; 16]) -> [bool; 16] {
     let (sum, _) = adder_rca_lsb_b16(
         input,
         [
-            true, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false,
-        ]
+            true, false, false, false, // row 0
+            false, false, false, false, // row 1
+            false, false, false, false, // row 2
+            false, false, false, false, // row 3
+        ],
     );
     sum
 }
 
 mod tests {
-    use crate::pc::chips::adder::{adder_rca_lsb_b16, full_adder, half_adder};
-
-    const B16_LSB_0: [bool; 16] = [
-        false, false, false, false, false, false, false, false, false, false, false, false, false,
-        false, false, false,
-    ];
-
-    const B16_LSB_1: [bool; 16] = [
-        true, false, false, false, false, false, false, false, false, false, false, false, false,
-        false, false, false,
-    ];
-
-    const B16_LSB_2: [bool; 16] = [
-        false, true, false, false, false, false, false, false, false, false, false, false, false,
-        false, false, false,
-    ];
-
-    const B16_LSB_3: [bool; 16] = [
-        true, true, false, false, false, false, false, false, false, false, false, false, false,
-        false, false, false,
-    ];
-
-    const B16_LSB_43690: [bool; 16] = [
-        false, true, false, true, false, true, false, true, false, true, false, true, false, true,
-        false, true,
-    ];
-
-    const B16_LSB_65534: [bool; 16] = [
-        false, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-        true,
-    ];
-
-    const B16_LSB_65535: [bool; 16] = [
-        true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-        true,
-    ];
-
-    fn b16_to_int_lsb(b16: [bool; 16]) -> i32 {
-        let mut res: i32 = 0;
-        for (i, &bit) in b16.iter().enumerate() {
-            if bit {
-                let app = res += 1 << i;
-            }
-        }
-        res
-    }
-
-    fn int_to_b16_lsb(n: i32) -> [bool; 16] {
-        let mut b16 = [false; 16];
-        let mut quotient = n;
-        let mut index = 0;
-        while quotient > 0 {
-            b16[index] = quotient % 2 == 1;
-            quotient /= 2;
-            index += 1;
-        }
-        b16
-    }
-
-    #[test]
-    fn test_internal_int_to_b16() {
-        // test the internal method
-        // in order to make sure correct values
-
-        assert_eq!(int_to_b16_lsb(0), B16_LSB_0);
-        assert_eq!(int_to_b16_lsb(1), B16_LSB_1);
-        assert_eq!(int_to_b16_lsb(2), B16_LSB_2);
-        assert_eq!(int_to_b16_lsb(3), B16_LSB_3);
-        assert_eq!(int_to_b16_lsb(43690), B16_LSB_43690);
-        assert_eq!(int_to_b16_lsb(65534), B16_LSB_65534);
-        assert_eq!(int_to_b16_lsb(65535), B16_LSB_65535);
-    }
-
-    #[test]
-    fn test_internal_b16_to_int() {
-        // test the internal method
-        // in order to make sure correct values
-        assert_eq!(b16_to_int_lsb(B16_LSB_0), 0);
-        assert_eq!(b16_to_int_lsb(B16_LSB_1), 1);
-        assert_eq!(b16_to_int_lsb(B16_LSB_2), 2);
-        assert_eq!(b16_to_int_lsb(B16_LSB_3), 3);
-        assert_eq!(b16_to_int_lsb(B16_LSB_43690), 43690);
-        assert_eq!(b16_to_int_lsb(B16_LSB_65534), 65534);
-        assert_eq!(b16_to_int_lsb(B16_LSB_65535), 65535);
-    }
-
     #[test]
     fn test_half_adder() {
+        use crate::pc::chips::adder::half_adder;
+
         assert_eq!(half_adder(false, false), (false, false));
         assert_eq!(half_adder(false, true), (true, false));
         assert_eq!(half_adder(true, false), (true, false));
@@ -146,6 +64,7 @@ mod tests {
 
     #[test]
     fn test_full_adder() {
+        use crate::pc::chips::adder::full_adder;
         assert_eq!(full_adder(false, false, false), (false, false));
         assert_eq!(full_adder(false, false, true), (true, false));
         assert_eq!(full_adder(false, true, false), (true, false));
@@ -166,6 +85,11 @@ mod tests {
 
     #[test]
     fn test_adder_rca_b16() {
+        use crate::{
+            pc::chips::adder::adder_rca_lsb_b16,
+            utils::convert::{b16_to_int_lsb, int_to_b16_lsb},
+        };
+
         // arrange
         let test_cases = vec![
             Atc {
