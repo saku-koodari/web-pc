@@ -135,7 +135,7 @@ mod tests {
     }
 
     // test cases for from_string
-    struct Tcfs {
+    struct TestCasesFromString {
         string_input: String,
 
         int_value: i16,
@@ -147,27 +147,31 @@ mod tests {
 
     #[test]
     fn test_from_string() {
-        use crate::{
-            utils::convert::{from_string},
-        };
+        use crate::utils::convert::from_string;
 
-
-        let test_cases: Vec<Tcfs> = vec![
+        let test_cases: Vec<TestCasesFromString> = vec![
             {
-                Tcfs {
+                TestCasesFromString {
                     string_input: "0".to_string(),
                     int_value: 0,
                     hex_string: "0000".to_string(),
                     bin_array: [false; 16],
                     bin_array_as_string: "0000000000000000".to_string(),
                     is_err: false,
+                },
+                TestCasesFromString {
+                    string_input: "1".to_string(),
+                    int_value: 1,
+                    hex_string: "0001".to_string(),
+                    bin_array: B16_LSB_1
+                    bin_array_as_string: "0000000000000001".to_string(),
+                    is_err: false,
                 }
+
             },
         ];
 
         for test_case in test_cases {
-
-
             let res = from_string(&test_case.string_input);
             assert_eq!(res.is_err(), test_case.is_err);
 
@@ -180,7 +184,6 @@ mod tests {
             assert_eq!(res.hex_string, test_case.hex_string);
             assert_eq!(res.bin_array, test_case.bin_array);
             assert_eq!(res.bin_array_as_string, test_case.bin_array_as_string);
-            
         }
     }
 
