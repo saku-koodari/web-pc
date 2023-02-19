@@ -89,7 +89,7 @@ impl eframe::App for GuiApp {
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.heading("Tools");
-            ui.label("Chips: 16-bit Adder");
+            
             panelAdder(ui, label, adderData, _frame);
 
             // this is a slider
