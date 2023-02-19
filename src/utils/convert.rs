@@ -22,6 +22,21 @@ pub fn int_to_b16_lsb(n: i32) -> [bool; 16] {
     b16
 }
 
+pub fn try_int_to_b16_lsb(n: i32) -> Result<[bool; 16], String> {
+    if n.abs() >= 2i32.pow(16) {
+        return Err(format!("{} is too large to fit into a 16-bit integer", n));
+    }
+    let mut b16 = [false; 16];
+    let mut quotient = n;
+    let mut index = 0;
+    while quotient > 0 {
+        b16[index] = quotient % 2 == 1;
+        quotient /= 2;
+        index += 1;
+    }
+    Ok(b16)
+}
+
 mod tests {
     #[test]
     fn test_internal_int_to_b16() {
