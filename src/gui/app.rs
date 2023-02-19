@@ -1,5 +1,7 @@
 use crate::pc::gates::gates_b1::and;
 
+use super::panels::adder::panelAdder;
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -80,27 +82,9 @@ impl eframe::App for GuiApp {
         });
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
-            use egui::{menu, Button};
             ui.heading("Tools");
             ui.label("Chips: 16-bit Adder");
-
-            //this is a textbox
-            let mut input_a = String::from("1");
-            let mut input_b = String::from("2");
-            ui.horizontal(|ui| {
-                ui.label("a:");
-                ui.text_edit_singleline(&mut input_a);
-            });
-
-            ui.horizontal(|ui| {
-                ui.label("b:");
-                ui.text_edit_singleline(&mut input_b);
-            });
-
-            ui.horizontal(|ui| {
-                ui.label("out:");
-                ui.text_edit_singleline(&mut input_b);
-            });
+            panelAdder(ui, label, value, _frame);
 
             // this is a slider
             // ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
