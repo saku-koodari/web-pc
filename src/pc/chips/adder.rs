@@ -42,18 +42,20 @@ pub fn inc16(input: [bool; 16]) -> [bool; 16] {
     let (sum, _) = adder_rca_lsb_b16(
         input,
         [
-            true, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false,
-        ]
+            true, false, false, false, // row 0
+            false, false, false, false, // row 1
+            false, false, false, false, // row 2
+            false, false, false, false, // row 3
+        ],
     );
     sum
 }
 
 mod tests {
-    use crate::{pc::chips::adder::{adder_rca_lsb_b16, full_adder, half_adder}, utils::convert::{int_to_b16_lsb, b16_to_int_lsb}};
-
     #[test]
     fn test_half_adder() {
+        use crate::pc::chips::adder::half_adder;
+
         assert_eq!(half_adder(false, false), (false, false));
         assert_eq!(half_adder(false, true), (true, false));
         assert_eq!(half_adder(true, false), (true, false));
@@ -62,6 +64,7 @@ mod tests {
 
     #[test]
     fn test_full_adder() {
+        use crate::pc::chips::adder::full_adder;
         assert_eq!(full_adder(false, false, false), (false, false));
         assert_eq!(full_adder(false, false, true), (true, false));
         assert_eq!(full_adder(false, true, false), (true, false));
@@ -82,6 +85,11 @@ mod tests {
 
     #[test]
     fn test_adder_rca_b16() {
+        use crate::{
+            pc::chips::adder::adder_rca_lsb_b16,
+            utils::convert::{b16_to_int_lsb, int_to_b16_lsb},
+        };
+
         // arrange
         let test_cases = vec![
             Atc {
