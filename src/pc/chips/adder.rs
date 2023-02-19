@@ -52,6 +52,8 @@ pub fn inc16(input: [bool; 16]) -> [bool; 16] {
 }
 
 mod tests {
+    use crate::utils::convert::ConvertResult;
+
     #[test]
     fn test_half_adder() {
         use crate::pc::chips::adder::half_adder;
@@ -75,64 +77,63 @@ mod tests {
         assert_eq!(full_adder(true, true, true), (true, true));
     }
 
-    // adder test case
-    struct Atc {
-        a: [bool; 16],
-        b: [bool; 16],
-        o: [bool; 16],
-        n: String,
-    }
-
     #[test]
     fn test_adder_rca_b16() {
         use crate::{
             pc::chips::adder::adder_rca_lsb_b16,
-            utils::convert::{b16_to_i16, i16_to_b16},
+            utils::convert::{from_b16, from_i16},
         };
+
+        struct TestCase {
+            input_a: ConvertResult,
+            input_b: ConvertResult,
+            output: ConvertResult,
+            name: String,
+        }
 
         // arrange
         let test_cases = vec![
-            Atc {
-                a: i16_to_b16(0),
-                b: i16_to_b16(0),
-                o: i16_to_b16(0),
-                n: String::from("test 1: 0 + 0 = 0"),
+            TestCase {
+                input_a: from_i16(0),
+                input_b: from_i16(0),
+                output: from_i16(0),
+                name: String::from("test 1: 0 + 0 = 0"),
             },
-            Atc {
-                a: i16_to_b16(1),
-                b: i16_to_b16(2),
-                o: i16_to_b16(3),
-                n: String::from("test 4: 1 + 2 = 3"),
+            TestCase {
+                input_a: from_i16(1),
+                input_b: from_i16(2),
+                output: from_i16(3),
+                name: String::from("test 4: 1 + 2 = 3"),
             },
-            Atc {
-                a: i16_to_b16(5),
-                b: i16_to_b16(-3),
-                o: i16_to_b16(2),
-                n: String::from("test 5: 5 - 3 = 2"),
+            TestCase {
+                input_a: from_i16(5),
+                input_b: from_i16(-3),
+                output: from_i16(2),
+                name: String::from("test 5: 5 - 3 = 2"),
             },
-            Atc {
-                a: i16_to_b16(0),
-                b: i16_to_b16(-100),
-                o: i16_to_b16(-100),
-                n: String::from("test 6: 0 - 100 = -100"),
-            }
+            TestCase {
+                input_a: from_i16(0),
+                input_b: from_i16(-100),
+                output: from_i16(-100),
+                name: String::from("test 6: 0 - 100 = -100"),
+            },
         ];
 
         for case in test_cases {
-            print!("\ntesting {n}...\n", n = case.n);
+            print!("\ntesting {n}...\n", n = case.name);
 
             // act
-            let (res, overflow) = adder_rca_lsb_b16(case.a, case.b);
+            let (res, overflow) = adder_rca_lsb_b16(case.input_a.bin_array, case.input_b.bin_array);
 
             // debug
             print!(
-                "expected: {o}. actual: {res}.\n",
-                o = b16_to_i16(case.o),
-                res = b16_to_i16(res)
+                "expected: {output}. actual: {res}.\n",
+                output = case.output,
+                res = from_b16(res)
             );
 
             // assert
-            assert_eq!(case.o, res);
+            assert_eq!(case.output.int_value, from_b16(res).int_value);
             assert_eq!(overflow, false);
 
             // debug

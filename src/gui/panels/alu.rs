@@ -28,7 +28,7 @@ impl Default for AluData {
     }
 }
 
-pub fn panelAlu(
+pub fn panel_alu(
     // ctx: &mut Context,
     ui: &mut egui::Ui,
     label: &mut String,
@@ -58,7 +58,7 @@ pub fn panelAlu(
                 let output_b16 =
                     crate::pc::chips::adder::adder_rca_lsb_b16(a.bin_array, b.bin_array);
 
-                let output_i16 = utils::convert::b16_to_i16(output_b16.0);
+                let output_i16 = utils::convert::from_b16(output_b16.0);
                 data.output = output_i16.to_string();
 
                 if output_b16.1 {

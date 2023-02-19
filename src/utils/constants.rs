@@ -58,15 +58,16 @@ pub mod i16_consts {
         false, false, false, false, // row 3
     ];
 
+    /// FIXED
     /// 16-bit value:
     ///  - Integer 21845.
     ///  - Binary: 1010 1010 1010 1010
     ///  - Hexadecimal: 0x5555.
     pub const B16_PLUS_21845: [bool; 16] = [
-        false, true, false, true, // row 0
-        false, true, false, true, // row 1
-        false, true, false, true, // row 2
-        false, true, false, true, // row 3
+        true, false, true, false, // row 0
+        true, false, true, false, // row 1
+        true, false, true, false, // row 2
+        true, false, true, false, // row 3
     ];
 
     /// 16-bit value:
@@ -96,10 +97,10 @@ pub mod i16_consts {
     /// - Binary: 1010 1010 1010 1010
     /// - Hexadecimal: 0xAAAA
     pub const B16_MINUS_21845: [bool; 16] = [
-        false, true, false, true, // row 0
-        false, true, false, true, // row 1
-        false, true, false, true, // row 2
-        false, true, false, true, // row 3
+        true, false, true, false, // row 0
+        true, false, true, false, // row 1
+        true, false, true, false, // row 2
+        true, false, true, false, // row 3
     ];
 
     /// 16-bit value:

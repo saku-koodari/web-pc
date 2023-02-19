@@ -19,7 +19,7 @@ impl Default for AdderData {
     }
 }
 
-pub fn panelAdder(
+pub fn panel_adder(
     // ctx: &mut Context,
     ui: &mut egui::Ui,
     label: &mut String,

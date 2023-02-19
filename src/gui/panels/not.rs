@@ -18,7 +18,7 @@ impl Default for NotData {
     }
 }
 
-pub fn panelNot(
+pub fn panel_not(
     ctx: &Context,
     ui: &mut egui::Ui,
     label: &mut String,
