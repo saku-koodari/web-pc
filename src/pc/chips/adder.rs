@@ -10,6 +10,9 @@ pub fn full_adder(a: bool, b: bool, c: bool) -> (bool, bool) {
     (sum2, or(carry1, carry2))
 }
 
+/// Adds two 16-bit binary numbers.
+/// Does not handle negative numbers,
+/// because the adder is using one's complement repsrentation.
 pub fn adder_b16(a: [bool; 16], b: [bool; 16]) -> [bool; 16] {
     let (sum00, c01) = half_adder(a[0], b[0]);
     let (sum01, c02) = full_adder(a[1], b[1], c01);
@@ -29,13 +32,14 @@ pub fn adder_b16(a: [bool; 16], b: [bool; 16]) -> [bool; 16] {
     let (sum15, _) = full_adder(a[15], b[15], c15);
 
     [
-        sum00, sum01, sum02, sum03, sum04, sum05, sum06, sum07, sum08, sum09, sum10, sum11,
-        sum12, sum13, sum14, sum15,
+        sum00, sum01, sum02, sum03, sum04, sum05, sum06, sum07, sum08, sum09, sum10, sum11, sum12,
+        sum13, sum14, sum15,
     ]
-
 }
 
 pub fn inc16(input: [bool; 16]) -> [bool; 16] {
+    // TODO: This might need optimization,
+    // because the adder_b16 is called here.
     let sum = adder_b16(
         input,
         // This value (1-6 bit +1) exists on utils-module as const B16_1, but it's not used here.
