@@ -11,7 +11,6 @@ pub fn full_adder(a: bool, b: bool, c: bool) -> (bool, bool) {
 }
 
 pub fn adder_rca_lsb_b16(a: [bool; 16], b: [bool; 16]) -> ([bool; 16], bool) {
-    // bit order here is LSB
     let (sum00, c01) = half_adder(a[0], b[0]);
     let (sum01, c02) = full_adder(a[1], b[1], c01);
     let (sum02, c03) = full_adder(a[2], b[2], c02);
@@ -41,18 +40,20 @@ pub fn adder_rca_lsb_b16(a: [bool; 16], b: [bool; 16]) -> ([bool; 16], bool) {
 pub fn inc16(input: [bool; 16]) -> [bool; 16] {
     let (sum, _) = adder_rca_lsb_b16(
         input,
+        // This value (1-6 bit +1) exists on utils-module as const B16_1, but it's not used here.
+        // This is because the utils-module is not allowed to use in the pc-module,
+        // Since the PC should handle only binary values and be independent from other modules.
+        // unit tests are only exception, in order to provided easines for testing.
         [
-            true, false, false, false, // row 0
-            false, false, false, false, // row 1
-            false, false, false, false, // row 2
-            false, false, false, false, // row 3
+            true, false, false, false, false, false, false, false, false, false, false, false,
+            false, false, false, false,
         ],
     );
     sum
 }
 
 mod tests {
-    use crate::utils::convert_old::ConvertResult;
+    use crate::utils::convert::ConvertResult;
 
     #[test]
     fn test_half_adder() {
@@ -81,13 +82,13 @@ mod tests {
     fn test_adder_rca_b16() {
         use crate::{
             pc::chips::adder::adder_rca_lsb_b16,
-            utils::convert_old::{from_b16, from_i16},
+            utils::convert::{from_b16, from_i16},
         };
 
         struct TestCase {
-            input_a: ConvertResult,
-            input_b: ConvertResult,
-            output: ConvertResult,
+            input_a: Result<ConvertResult, String>,
+            input_b: Result<ConvertResult, String>,
+            output: Result<ConvertResult, String>,
             name: String,
         }
 
@@ -122,8 +123,11 @@ mod tests {
         for case in test_cases {
             print!("\ntesting {n}...\n", n = case.name);
 
+            let a = case.input_a.unwrap().as_array_b16;
+            let b = case.input_b.unwrap().as_array_b16;
+
             // act
-            let (res, overflow) = adder_rca_lsb_b16(case.input_a.bin_array, case.input_b.bin_array);
+            let (res, overflow) = adder_rca_lsb_b16(a, b);
 
             // debug
             // print!(
@@ -133,7 +137,8 @@ mod tests {
             // );
 
             // assert
-            assert_eq!(case.output.int_value, from_b16(res).int_value);
+            let conv_res = from_b16(res).unwrap();
+            assert_eq!(case.output.unwrap().as_integer, conv_res.as_integer);
             assert_eq!(overflow, false);
 
             // debug
@@ -143,7 +148,4 @@ mod tests {
 
     // TODO: test adder_rca_b16 with overflow
     // TODO: test inc16
-
-    #[test]
-    fn test_inc() {}
 }

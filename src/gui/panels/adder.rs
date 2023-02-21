@@ -1,4 +1,4 @@
-use crate::utils::{self, convert_old::from_string};
+use crate::utils::{self, convert::from_string_integer};
 
 pub struct AdderData {
     // TODO: Is it possible to convert into i32?
@@ -38,15 +38,16 @@ pub fn panel_adder(
     });
 
     if ui.button("Calculate").clicked() {
-        let result = from_string(&data.input_a)
-            .and_then(|a| from_string(&data.input_b).map(|b| (a.bin_array, b.bin_array)));
+        let result = from_string_integer(data.input_a.clone()).and_then(|a| {
+            from_string_integer(data.input_b.clone()).map(|b| (a.as_array_b16, b.as_array_b16))
+        });
 
         match result {
             Ok((a, b)) => {
                 let output_b16 = crate::pc::chips::adder::adder_rca_lsb_b16(a, b);
 
-                let output_i32 = utils::convert_old::from_b16(output_b16.0);
-                data.output = output_i32.to_string();
+                let output_i32 = utils::convert::from_b16(output_b16.0);
+                data.output = output_i32.unwrap().to_string(); // TODO: Do we need to check the error?
 
                 if output_b16.1 {
                     data.error = "Overflow!".to_owned();

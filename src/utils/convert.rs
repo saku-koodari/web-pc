@@ -1,13 +1,13 @@
 use std::fmt;
 
-pub struct NEW_ConvertResult {
+pub struct ConvertResult {
     pub as_array_b16: [bool; 16],
     pub as_integer: i16,
     pub as_string_hex: String,
     pub as_string_bin: String,
 }
 
-impl fmt::Display for NEW_ConvertResult {
+impl fmt::Display for ConvertResult {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -17,7 +17,7 @@ impl fmt::Display for NEW_ConvertResult {
     }
 }
 
-pub fn from_b16(b16: [bool; 16]) -> Result<NEW_ConvertResult, String> {
+pub fn from_b16(b16: [bool; 16]) -> Result<ConvertResult, String> {
     let as_string_bin = b16_to_byte_string(b16);
     let int32_conversion = i32::from_str_radix(&as_string_bin, 2);
     if int32_conversion.is_err() {
@@ -32,7 +32,7 @@ pub fn from_b16(b16: [bool; 16]) -> Result<NEW_ConvertResult, String> {
     let as_int32 = int32_conversion.unwrap();
     let as_integer = as_int32 as i16;
 
-    Ok(NEW_ConvertResult {
+    Ok(ConvertResult {
         as_array_b16: b16,
         as_integer,
         as_string_hex: format!("0x{:04X}", as_integer),
@@ -40,7 +40,7 @@ pub fn from_b16(b16: [bool; 16]) -> Result<NEW_ConvertResult, String> {
     })
 }
 
-pub fn from_i16(integer: i16) -> Result<NEW_ConvertResult, String> {
+pub fn from_i16(integer: i16) -> Result<ConvertResult, String> {
     let as_string_bin = format!("{:016b}", integer);
     println!("Conversion: 1/2 {integer} as string bin: {as_string_bin}");
 
@@ -51,7 +51,7 @@ pub fn from_i16(integer: i16) -> Result<NEW_ConvertResult, String> {
     );
     println!("");
 
-    Ok(NEW_ConvertResult {
+    Ok(ConvertResult {
         as_array_b16,
         as_integer: integer,
         as_string_hex: format!("0x{:04X}", integer),
@@ -59,7 +59,7 @@ pub fn from_i16(integer: i16) -> Result<NEW_ConvertResult, String> {
     })
 }
 
-pub fn from_string_integer(str: String) -> Result<NEW_ConvertResult, String> {
+pub fn from_string_integer(str: String) -> Result<ConvertResult, String> {
     let int_value_res = str.parse::<i16>();
     if int_value_res.is_err() {
         return Err(format!("Cannot convert '{str}' into i16 value"));
