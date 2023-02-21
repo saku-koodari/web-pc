@@ -33,7 +33,15 @@ pub fn xnor(a: bool, b: bool) -> bool {
     not(a ^ b)
 }
 
-// Multiplexer
+/// 1-bit Multiplexer. a.ka. data selector. if sel is true, return b, else return a
+///
+/// ## Arguments
+/// * `a` - first input
+/// * `b` - second input
+/// * `sel` - selector
+///
+/// ## Returns
+/// * `bool` - output
 pub fn mux(a: bool, b: bool, sel: bool) -> bool {
     or(and(a, not(sel)), and(b, sel))
 }
@@ -117,6 +125,7 @@ mod tests {
             a       0   a
             a       1   b
         */
+        //              a     b      sel     out
         assert_eq!(mux(false, false, false), false);
         assert_eq!(mux(false, true, false), false);
         assert_eq!(mux(true, false, false), true);

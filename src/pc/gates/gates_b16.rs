@@ -154,7 +154,15 @@ pub fn xnor16(a: [bool; 16], b: [bool; 16]) -> [bool; 16] {
     ]
 }
 
-/// 16-bit  MUX Gate
+/// 16-bit MUX Gate. if sel is `true`, return `b`, else return `a`
+///
+/// ## Arguments
+/// * `a` - first input
+/// * `b` - second input
+/// * `sel` - selector
+///
+/// ## Returns
+/// * `bool` - output, either `a` or `b`
 pub fn mux16(a: [bool; 16], b: [bool; 16], sel: bool) -> [bool; 16] {
     [
         mux(a[0], b[0], sel),
@@ -224,7 +232,7 @@ mod tests {
 
     #[test]
     fn test_and() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
 
         assert_eq!(and16(B16_TRUE, B16_TRUE), B16_TRUE);
         assert_eq!(and16(B16_TRUE, B16_FALSE), B16_FALSE);
@@ -234,7 +242,7 @@ mod tests {
 
     #[test]
     fn test_or() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
 
         assert_eq!(or16(B16_TRUE, B16_TRUE), B16_TRUE);
         assert_eq!(or16(B16_TRUE, B16_FALSE), B16_TRUE);
@@ -244,7 +252,7 @@ mod tests {
 
     #[test]
     fn test_not() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
 
         assert_eq!(not16(B16_TRUE), B16_FALSE);
         assert_eq!(not16(B16_FALSE), B16_TRUE);
@@ -252,8 +260,8 @@ mod tests {
 
     #[test]
     fn test_xor() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
-        
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
+
         assert_eq!(xor16(B16_TRUE, B16_TRUE), B16_FALSE);
         assert_eq!(xor16(B16_TRUE, B16_FALSE), B16_TRUE);
         assert_eq!(xor16(B16_FALSE, B16_TRUE), B16_TRUE);
@@ -262,7 +270,7 @@ mod tests {
 
     #[test]
     fn test_nand() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
 
         assert_eq!(nand16(B16_TRUE, B16_TRUE), B16_FALSE);
         assert_eq!(nand16(B16_TRUE, B16_FALSE), B16_TRUE);
@@ -272,7 +280,7 @@ mod tests {
 
     #[test]
     fn test_nor() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
 
         assert_eq!(nor16(B16_TRUE, B16_TRUE), B16_FALSE);
         assert_eq!(nor16(B16_TRUE, B16_FALSE), B16_FALSE);
@@ -282,7 +290,7 @@ mod tests {
 
     #[test]
     fn test_xnor() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
 
         assert_eq!(xnor16(B16_TRUE, B16_TRUE), B16_TRUE);
         assert_eq!(xnor16(B16_TRUE, B16_FALSE), B16_FALSE);
@@ -292,7 +300,7 @@ mod tests {
 
     #[test]
     fn test_mux() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
 
         assert_eq!(mux16(B16_TRUE, B16_FALSE, false), B16_TRUE);
         assert_eq!(mux16(B16_TRUE, B16_FALSE, true), B16_FALSE);
@@ -302,7 +310,7 @@ mod tests {
 
     #[test]
     fn test_dmux() {
-        use crate::utils::constants::{B16_FALSE, B16_TRUE};
+        use crate::utils::constants::b16_consts::{B16_FALSE, B16_TRUE};
 
         assert_eq!(demux16(B16_TRUE, false), (B16_TRUE, B16_FALSE));
         assert_eq!(demux16(B16_TRUE, true), (B16_FALSE, B16_TRUE));

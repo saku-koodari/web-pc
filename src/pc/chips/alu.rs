@@ -1,30 +1,38 @@
-use crate::pc::gates::gates_b16::mux16;
+use crate::pc::gates::gates_b16::{mux16, not16};
 
 // our ALU can't do multiplication or division
 // they will be implemented on the software level.
 // However, that will be a trade-off between speed and having more "hardware".
 pub fn alu(
-    x: [bool; 16],
-    y: [bool; 16],
-    zx: bool,
-    nx: bool,
-    zy: bool,
-    ny: bool,
-    f: bool,
-    no: bool,
+    x: [bool; 16], // 16-bit input x
+    y: [bool; 16], // 16-bit input y
+    zx: bool,      // zero the x input?
+    nx: bool,      // negate the x input?
+    zy: bool,      // zero the y input?
+    ny: bool,      // negate the y input?
+    f: bool,       // function selector
+    no: bool,      // negate the output?
 ) -> (
     [bool; 16], // out
-    bool,       // zr
-    bool,       // ng
+    bool,       // zr: zero result
+    bool,       // ng: negative result
 ) {
     // Manipulates the x and y inputs as follows:
     // if (zx == 1)  sets x = 0       // 16-bit true constant
-    let out = mux16(x, [false; 16], zx);
+    let opcode_reset_x = mux16(x, [false; 16], zx);
 
     // if (nx == 1)  sets x = !x      // bitwise NOT
+    let opcode_negator_x = mux16(opcode_reset_x, not16(x), nx);
+
     // if (zy == 1)  sets y = 0       // 16-bit true constant
+    let opcode_reset_y = mux16(y, [false; 16], zy);
+
     // if (ny == 1)  sets y = !y      // bitwise NOT
+    let opcode_negator_y = mux16(opcode_reset_y, not16(y), ny);
+
     // if (f == 1)   sets out = x + y // int. 2's s-complement addition
+    // let res = mux16(  f)
+
     // if (f == 0)   sets out = x & y // bitwise AND
     // if (no == 1)  sets out = !out  // bitwise NOT
     // if (out == 0) sets zr = 1      // 1-bit true constant
@@ -42,7 +50,15 @@ pub fn alu(
 mod tests {
     // unit tests for ALU (arithmatic logic unit)
     // use super::*;
-
+    //
+    // meaning of the control bits:
+    // zx: set x to zero
+    // nx: negates x
+    // zy: set y to zero
+    // ny: negates y
+    // f: function selector
+    // out: output of the function
+    //
     // preset-x: pre-setting the x input
     // preset-y: pre-setting the y input
     // sel: selecting between computing + or &
@@ -67,28 +83,28 @@ mod tests {
     // |    |            control bits           | out |
     // +----+-----------------------------------+-----+
     // |    | preset-x  | preset-y  | sel |post | out |
-    // +----+-----+-----+-----+-----+-----+-----+-----+
-    // | ## | zx  |  x  | zy  | ny  |  f  | no  | out |
-    // +----+-----+-----+-----+-----+-----+-----+-----+
-    // | 01 |  1  |  0  |  1  |  0  |  1  |  0  |  0  |
-    // | 02 |  1  |  1  |  1  |  1  |  1  |  1  |  1  |
-    // | 03 |  1  |  1  |  1  |  0  |  1  |  0  | -1  |
-    // | 04 |  0  |  0  |  1  |  1  |  0  |  0  |  x  |
-    // | 05 |  1  |  1  |  0  |  0  |  0  |  0  |  y  |
-    // | 06 |  0  |  0  |  1  |  1  |  0  |  1  | !x  |
-    // | 07 |  1  |  1  |  0  |  0  |  0  |  1  | !y  |
-    // | 08 |  0  |  0  |  1  |  1  |  1  |  1  | -x  |
-    // | 09 |  1  |  1  |  0  |  0  |  1  |  1  | -y  |
-    // | 10 |  0  |  1  |  1  |  1  |  1  |  1  | x+1 |
-    // | 11 |  1  |  1  |  0  |  1  |  1  |  1  | y+1 |
-    // | 12 |  0  |  0  |  1  |  1  |  1  |  0  | x-1 |
-    // | 13 |  1  |  1  |  0  |  0  |  1  |  0  | y-1 |
-    // | 14 |  0  |  0  |  0  |  0  |  1  |  0  | x+y |
-    // | 15 |  0  |  1  |  0  |  0  |  1  |  1  | x-y |
-    // | 16 |  0  |  0  |  0  |  1  |  1  |  1  | y-x |
-    // | 17 |  0  |  0  |  0  |  0  |  0  |  0  | x&y |
-    // | 18 |  0  |  1  |  0  |  1  |  0  |  1  | y|y |
-    // |-+-----+-----+-----+-----+-----+-----+-----+
+    // +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-------+
+    // | ## | zx  | nx  | zy  | ny  |  f  | no  | out | => |  6-bit = opcodes | instr |
+    // +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-------+
+    // | 01 |  1  |  0  |  1  |  0  |  1  |  0  |  0  |    | 101010 =    2A   | reset |
+    // | 02 |  1  |  1  |  1  |  1  |  1  |  1  |  1  |    | 111111 =    3F   | fill  |
+    // | 03 |  1  |  1  |  1  |  0  |  1  |  0  | -1  |    | 111010 =    3E   | neg   |
+    // | 04 |  0  |  0  |  1  |  1  |  0  |  0  |  x  |    | 001100 =    0C   | x     |
+    // | 05 |  1  |  1  |  0  |  0  |  0  |  0  |  y  |    | 110000 =    30   | y     |
+    // | 06 |  0  |  0  |  1  |  1  |  0  |  1  | !x  |    | 001101 =    0D   | negx  |
+    // | 07 |  1  |  1  |  0  |  0  |  0  |  1  | !y  |    | 110001 =    31   | negy  |
+    // | 08 |  0  |  0  |  1  |  1  |  1  |  1  | -x  |    | 001111 =    0F   | xsub  |
+    // | 09 |  1  |  1  |  0  |  0  |  1  |  1  | -y  |    | 110011 =    33   | ysub  |
+    // | 10 |  0  |  1  |  1  |  1  |  1  |  1  | x+1 |    | 011111 =    1F   | plux  |
+    // | 11 |  1  |  1  |  0  |  1  |  1  |  1  | y+1 |    | 110111 =    37   | pluy  |
+    // | 12 |  0  |  0  |  1  |  1  |  1  |  0  | x-1 |    | 001110 =    0E   | subx  |
+    // | 13 |  1  |  1  |  0  |  0  |  1  |  0  | y-1 |    | 110010 =    32   | suby  |
+    // | 14 |  0  |  0  |  0  |  0  |  1  |  0  | x+y |    | 000010 =    02   | add   |
+    // | 15 |  0  |  1  |  0  |  0  |  1  |  1  | x-y |    | 010011 =    13   | sub   |
+    // | 16 |  0  |  0  |  0  |  1  |  1  |  1  | y-x |    | 000111 =    07   | rsub  |
+    // | 17 |  0  |  0  |  0  |  0  |  0  |  0  | x&y |    | 000000 =    00   | and   |
+    // | 18 |  0  |  1  |  0  |  1  |  0  |  1  | y|y |    | 010101 =    15   | or    |
+    // |----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-------+
 
     // 4-bit Example: (row 6 out= !x)
     // x: 1 1 0 0

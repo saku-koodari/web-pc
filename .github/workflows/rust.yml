@@ -86,7 +86,15 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: -- -D warnings
+          # TODO: Uncomment
+          # this is commented, because
+          # 1) clippy is nice to have, to improve code quality
+          # 2) it's too impractical to fix clippy errors.
+          # Some of the errors, like having too many arguments:,
+          # It is just how circuits are physically built.
+          # These can, and should be fixed.
+          # But let's go to version 1.0 before enabling this.
+          #args: -- -D warnings
 
   trunk:
     name: trunk
@@ -103,3 +111,5 @@ jobs:
         run: wget -qO- https://github.com/thedodd/trunk/releases/latest/download/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
       - name: Build
         run: ./trunk build
+     - name: Print Rust version
+        run: rustc --version

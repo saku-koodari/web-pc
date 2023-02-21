@@ -1,6 +1,8 @@
-use crate::pc::gates::gates_b1::and;
-
-use super::panels::adder::{panelAdder, AdderData};
+use super::panels::{
+    adder::{panel_adder, AdderData},
+    alu::{panel_alu, AluData},
+    not::{panel_not, NotData},
+};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -14,7 +16,13 @@ pub struct GuiApp {
     value: f32,
 
     #[serde(skip)]
-    adderData: AdderData,
+    adder_data: AdderData,
+
+    #[serde(skip)]
+    alu_data: AluData,
+
+    #[serde(skip)]
+    not_data: NotData,
 }
 
 impl Default for GuiApp {
@@ -23,7 +31,9 @@ impl Default for GuiApp {
             // Example stuff:
             label: "My virtual PC".to_owned(),
             value: 2.7,
-            adderData: AdderData::default(),
+            adder_data: AdderData::default(),
+            alu_data: AluData::default(),
+            not_data: NotData::default(),
         }
     }
 }
@@ -56,7 +66,9 @@ impl eframe::App for GuiApp {
         let Self {
             label,
             value,
-            adderData,
+            adder_data,
+            alu_data,
+            not_data,
         } = self;
 
         // Examples of how to create different panels and windows.
@@ -89,8 +101,10 @@ impl eframe::App for GuiApp {
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.heading("Tools");
-            
-            panelAdder(ui, label, adderData, _frame);
+
+            panel_not(&ctx, ui, label, not_data, _frame);
+            panel_adder(/*ctx,*/ ui, label, adder_data, _frame);
+            panel_alu(/*ctx,*/ ui, label, alu_data, _frame);
 
             // this is a slider
             // ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));

@@ -10,8 +10,10 @@ pub fn full_adder(a: bool, b: bool, c: bool) -> (bool, bool) {
     (sum2, or(carry1, carry2))
 }
 
-pub fn adder_rca_lsb_b16(a: [bool; 16], b: [bool; 16]) -> ([bool; 16], bool) {
-    // bit order here is LSB
+/// Adds two 16-bit binary numbers.
+/// Does not handle negative numbers,
+/// because the adder is using one's complement repsrentation.
+pub fn adder_b16(a: [bool; 16], b: [bool; 16]) -> [bool; 16] {
     let (sum00, c01) = half_adder(a[0], b[0]);
     let (sum01, c02) = full_adder(a[1], b[1], c01);
     let (sum02, c03) = full_adder(a[2], b[2], c02);
@@ -27,31 +29,34 @@ pub fn adder_rca_lsb_b16(a: [bool; 16], b: [bool; 16]) -> ([bool; 16], bool) {
     let (sum12, c13) = full_adder(a[12], b[12], c12);
     let (sum13, c14) = full_adder(a[13], b[13], c13);
     let (sum14, c15) = full_adder(a[14], b[14], c14);
-    let (sum15, cout) = full_adder(a[15], b[15], c15);
+    let (sum15, _) = full_adder(a[15], b[15], c15);
 
-    (
-        [
-            sum00, sum01, sum02, sum03, sum04, sum05, sum06, sum07, sum08, sum09, sum10, sum11,
-            sum12, sum13, sum14, sum15,
-        ],
-        cout,
-    )
+    [
+        sum00, sum01, sum02, sum03, sum04, sum05, sum06, sum07, sum08, sum09, sum10, sum11, sum12,
+        sum13, sum14, sum15,
+    ]
 }
 
 pub fn inc16(input: [bool; 16]) -> [bool; 16] {
-    let (sum, _) = adder_rca_lsb_b16(
+    // TODO: This might need optimization,
+    // because the adder_b16 is called here.
+    let sum = adder_b16(
         input,
+        // This value (1-6 bit +1) exists on utils-module as const B16_1, but it's not used here.
+        // This is because the utils-module is not allowed to use in the pc-module,
+        // Since the PC should handle only binary values and be independent from other modules.
+        // unit tests are only exception, in order to provided easines for testing.
         [
-            true, false, false, false, // row 0
-            false, false, false, false, // row 1
-            false, false, false, false, // row 2
-            false, false, false, false, // row 3
+            true, false, false, false, false, false, false, false, false, false, false, false,
+            false, false, false, false,
         ],
     );
     sum
 }
 
 mod tests {
+    use crate::utils::convert::ConvertResult;
+
     #[test]
     fn test_half_adder() {
         use crate::pc::chips::adder::half_adder;
@@ -75,83 +80,70 @@ mod tests {
         assert_eq!(full_adder(true, true, true), (true, true));
     }
 
-    // adder test case
-    struct Atc {
-        a: [bool; 16],
-        b: [bool; 16],
-        o: [bool; 16],
-        n: String,
-    }
-
     #[test]
     fn test_adder_rca_b16() {
         use crate::{
-            pc::chips::adder::adder_rca_lsb_b16,
-            utils::convert::{b16_to_int_lsb, int_to_b16_lsb},
+            pc::chips::adder::adder_b16,
+            utils::convert::{from_b16, from_i16},
         };
+
+        struct TestCase {
+            input_a: Result<ConvertResult, String>,
+            input_b: Result<ConvertResult, String>,
+            output: Result<ConvertResult, String>,
+            name: String,
+        }
 
         // arrange
         let test_cases = vec![
-            Atc {
-                a: int_to_b16_lsb(0),
-                b: int_to_b16_lsb(0),
-                o: int_to_b16_lsb(0),
-                n: String::from("test 1: 0 + 0 = 0"),
+            TestCase {
+                input_a: from_i16(0),
+                input_b: from_i16(0),
+                output: from_i16(0),
+                name: String::from("test 1: 0 + 0 = 0"),
             },
-            Atc {
-                a: int_to_b16_lsb(0),
-                b: int_to_b16_lsb(1),
-                o: int_to_b16_lsb(1),
-                n: String::from("test 2: 0 + 1 = 1"),
+            TestCase {
+                input_a: from_i16(1),
+                input_b: from_i16(2),
+                output: from_i16(3),
+                name: String::from("test 4: 1 + 2 = 3"),
             },
-            Atc {
-                a: int_to_b16_lsb(1),
-                b: int_to_b16_lsb(1),
-                o: int_to_b16_lsb(2),
-                n: String::from("test 3: 1 + 1 = 2"),
+            TestCase {
+                input_a: from_i16(5),
+                input_b: from_i16(-3),
+                output: from_i16(2),
+                name: String::from("test 5: 5 - 3 = 2"),
             },
-            Atc {
-                a: int_to_b16_lsb(1),
-                b: int_to_b16_lsb(2),
-                o: int_to_b16_lsb(3),
-                n: String::from("test 4: 1 + 2 = 3"),
-            },
-            Atc {
-                a: int_to_b16_lsb(8),
-                b: int_to_b16_lsb(8),
-                o: int_to_b16_lsb(16),
-                n: String::from("test 5: 8 + 8 = 16"),
-            },
-            Atc {
-                a: int_to_b16_lsb(999),
-                b: int_to_b16_lsb(7777),
-                o: int_to_b16_lsb(8776),
-                n: String::from("test 6: 999 + 7777 = 8776"),
-            },
-            Atc {
-                a: int_to_b16_lsb(16384),
-                b: int_to_b16_lsb(49151),
-                o: int_to_b16_lsb(65535),
-                n: String::from("test 7: 16384 + 49151 = 65535"),
+            TestCase {
+                input_a: from_i16(0),
+                input_b: from_i16(-100),
+                output: from_i16(-100),
+                name: String::from("test 6: 0 - 100 = -100"),
             },
         ];
 
         for case in test_cases {
-            print!("\ntesting {n}...\n", n = case.n);
+            print!("\ntesting {n}...\n", n = case.name);
+
+            let input_a = case.input_a.unwrap();
+            let input_b = case.input_b.unwrap();
+
+            println!("a: {input_a}");
+            println!("b: {input_b}");
 
             // act
-            let (res, overflow) = adder_rca_lsb_b16(case.a, case.b);
+            let res = adder_b16(input_a.as_array_b16, input_b.as_array_b16);
 
             // debug
-            print!(
-                "expected: {o}. actual: {res}.\n",
-                o = b16_to_int_lsb(case.o),
-                res = b16_to_int_lsb(res)
-            );
+            // print!(
+            //     "expected: {output}. actual: {res}.\n",
+            //     output = case.output,
+            //     res = from_b16(res)
+            // );
 
             // assert
-            assert_eq!(case.o, res);
-            assert_eq!(overflow, false);
+            let conv_res = from_b16(res).unwrap();
+            assert_eq!(case.output.unwrap().as_integer, conv_res.as_integer);
 
             // debug
             print!("Test passed.\n");
@@ -160,7 +152,4 @@ mod tests {
 
     // TODO: test adder_rca_b16 with overflow
     // TODO: test inc16
-
-    #[test]
-    fn test_inc() {}
 }

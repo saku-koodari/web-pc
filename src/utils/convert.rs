@@ -1,79 +1,179 @@
-/// Converts a 16-bit array to an integer, LSB first.
-pub fn b16_to_int_lsb(b16: [bool; 16]) -> i32 {
-    let mut res: i32 = 0;
-    for (i, &bit) in b16.iter().enumerate() {
-        if bit {
-            let _ = res += 1 << i;
-        }
-    }
-    res
+use std::fmt;
+
+pub struct ConvertResult {
+    pub as_array_b16: [bool; 16],
+    pub as_integer: i16,
+    pub as_string_hex: String,
+    pub as_string_bin: String,
 }
 
-/// Converts an 32-bit integer to a 16-bit array, LSB first.
-pub fn int_to_b16_lsb(n: i32) -> [bool; 16] {
-    let mut b16 = [false; 16];
-    let mut quotient = n;
-    let mut index = 0;
-    while quotient > 0 {
-        b16[index] = quotient % 2 == 1;
-        quotient /= 2;
-        index += 1;
+impl fmt::Display for ConvertResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "i16: {}, hex: {}, bin: {:?}, bytes: {:?}",
+            self.as_integer, self.as_string_hex, self.as_string_bin, self.as_array_b16
+        )
     }
-    b16
 }
 
-/// Converts a string into LSB 16-bit array.
-pub fn str_to_b16_lsb(str: &str) -> Result<[bool; 16], String> {
-    let str_parse_res = str.parse::<i32>();
-    if str_parse_res.is_err() {
-        return Err(format!("'{}' cannot be parsed into 32-bit integer", str));
+pub fn from_b16(b16: [bool; 16]) -> Result<ConvertResult, String> {
+    let as_string_bin = b16_to_byte_string(b16);
+    let int32_conversion = i32::from_str_radix(&as_string_bin, 2);
+    if int32_conversion.is_err() {
+        let error = int32_conversion.err().unwrap();
+        return Err(format!(
+            "Cannot convert '{}' into i16 value because {}",
+            as_string_bin, error
+        ));
     }
 
-    let n = str_parse_res.unwrap();
+    let as_int32 = int32_conversion.unwrap();
+    let as_integer = as_int32 as i16;
 
-    if n.abs() >= 2i32.pow(16) {
-        return Err(format!("{} is too large to fit into a 16-bit array", n));
+    Ok(ConvertResult {
+        as_array_b16: b16,
+        as_integer,
+        as_string_hex: format!("0x{:04X}", as_integer),
+        as_string_bin,
+    })
+}
+
+pub fn from_i16(integer: i16) -> Result<ConvertResult, String> {
+    let as_string_bin = format!("{:016b}", integer);
+    println!("Conversion: 1/2 {integer} as string bin: {as_string_bin}");
+
+    let as_array_b16 = byte_string_to_b16(as_string_bin.to_owned());
+    println!(
+        "Conversion: 2/2 {integer} as byte array: {:?}",
+        as_array_b16
+    );
+
+    Ok(ConvertResult {
+        as_array_b16,
+        as_integer: integer,
+        as_string_hex: format!("0x{:04X}", integer),
+        as_string_bin,
+    })
+}
+
+pub fn from_string_integer(str: String) -> Result<ConvertResult, String> {
+    let int_value_res = str.parse::<i16>();
+    if int_value_res.is_err() {
+        return Err(format!("Cannot convert '{str}' into i16 value"));
     }
 
-    Ok(int_to_b16_lsb(n))
+    from_i16(int_value_res.unwrap())
+}
+
+// these will be tested via test_from_* - tests.
+// not the most unit-testy way,
+// but modularitizing the methods would be overkill.
+
+fn b16_to_byte_string(b16: [bool; 16]) -> String {
+    let mut result = String::new();
+    for i in (0..16).rev() {
+        result.push(if b16[i] { '1' } else { '0' });
+    }
+    result
+}
+
+fn byte_string_to_b16(byte_string: String) -> [bool; 16] {
+    let mut result = [false; 16];
+    for (i, s) in byte_string.chars().rev().enumerate() {
+        result[i] = s == '1';
+    }
+    result
 }
 
 mod tests {
-    #[test]
-    fn test_internal_int_to_b16() {
-        use crate::utils::{
-            constants::{
-                B16_LSB_0, B16_LSB_1, B16_LSB_2, B16_LSB_3, B16_LSB_43690, B16_LSB_65534,
-                B16_LSB_65535,
-            },
-            convert::int_to_b16_lsb,
-        };
 
-        assert_eq!(int_to_b16_lsb(0), B16_LSB_0);
-        assert_eq!(int_to_b16_lsb(1), B16_LSB_1);
-        assert_eq!(int_to_b16_lsb(2), B16_LSB_2);
-        assert_eq!(int_to_b16_lsb(3), B16_LSB_3);
-        assert_eq!(int_to_b16_lsb(43690), B16_LSB_43690);
-        assert_eq!(int_to_b16_lsb(65534), B16_LSB_65534);
-        assert_eq!(int_to_b16_lsb(65535), B16_LSB_65535);
+    // TODO: test the error cases
+
+    #[test]
+    fn test_from_b16() {
+        use crate::utils::{
+            constants::i16_consts::{
+                B16_0, B16_MINUS_1, B16_MINUS_2, B16_MINUS_21846, B16_MINUS_32768, B16_PLUS_1,
+                B16_PLUS_2, B16_PLUS_21845, B16_PLUS_32767,
+            },
+            convert::from_b16,
+        };
+        assert_eq!(from_b16(B16_0).unwrap().as_integer, 0);
+        assert_eq!(from_b16(B16_PLUS_1).unwrap().as_integer, 1);
+        assert_eq!(from_b16(B16_PLUS_2).unwrap().as_integer, 2);
+        assert_eq!(from_b16(B16_PLUS_21845).unwrap().as_integer, 21845);
+        assert_eq!(from_b16(B16_PLUS_32767).unwrap().as_integer, 32767);
+        assert_eq!(from_b16(B16_MINUS_32768).unwrap().as_integer, -32768);
+        assert_eq!(from_b16(B16_MINUS_21846).unwrap().as_integer, -21846);
+        assert_eq!(from_b16(B16_MINUS_2).unwrap().as_integer, -2);
+        assert_eq!(from_b16(B16_MINUS_1).unwrap().as_integer, -1);
     }
 
     #[test]
-    fn test_internal_b16_to_int() {
+    fn test_from_i16() {
         use crate::utils::{
-            constants::{
-                B16_LSB_0, B16_LSB_1, B16_LSB_2, B16_LSB_3, B16_LSB_43690, B16_LSB_65534,
-                B16_LSB_65535,
+            constants::i16_consts::{
+                B16_0, B16_MINUS_1, B16_MINUS_2, B16_MINUS_21846, B16_MINUS_32768, B16_PLUS_1,
+                B16_PLUS_2, B16_PLUS_21845, B16_PLUS_32767,
             },
-            convert::b16_to_int_lsb,
+            convert::from_i16,
         };
 
-        assert_eq!(b16_to_int_lsb(B16_LSB_0), 0);
-        assert_eq!(b16_to_int_lsb(B16_LSB_1), 1);
-        assert_eq!(b16_to_int_lsb(B16_LSB_2), 2);
-        assert_eq!(b16_to_int_lsb(B16_LSB_3), 3);
-        assert_eq!(b16_to_int_lsb(B16_LSB_43690), 43690);
-        assert_eq!(b16_to_int_lsb(B16_LSB_65534), 65534);
-        assert_eq!(b16_to_int_lsb(B16_LSB_65535), 65535);
+        // The test needs to be against the binary constants
+        // so that it tests the conversion from i16 to b16.
+        assert_eq!(from_i16(0).unwrap().as_array_b16, B16_0);
+        assert_eq!(from_i16(1).unwrap().as_array_b16, B16_PLUS_1);
+        assert_eq!(from_i16(2).unwrap().as_array_b16, B16_PLUS_2);
+        assert_eq!(from_i16(21845).unwrap().as_array_b16, B16_PLUS_21845);
+        assert_eq!(from_i16(32767).unwrap().as_array_b16, B16_PLUS_32767);
+        assert_eq!(from_i16(-32768).unwrap().as_array_b16, B16_MINUS_32768);
+        assert_eq!(from_i16(-21846).unwrap().as_array_b16, B16_MINUS_21846);
+        assert_eq!(from_i16(-2).unwrap().as_array_b16, B16_MINUS_2);
+        assert_eq!(from_i16(-1).unwrap().as_array_b16, B16_MINUS_1);
+    }
+
+    #[test]
+    fn test_from_string_integer() {
+        use crate::utils::{
+            constants::i16_consts::{
+                B16_0, B16_MINUS_1, B16_MINUS_2, B16_MINUS_21846, B16_MINUS_32768, B16_PLUS_1,
+                B16_PLUS_2, B16_PLUS_21845, B16_PLUS_32767,
+            },
+            convert::from_string_integer,
+        };
+
+        // Arrange
+        let str_zero = String::from("0");
+        let str_plus_one = String::from("1");
+        let str_plus_two = String::from("2");
+        let str_plus_21845 = String::from("21845");
+        let str_plus_32767 = String::from("32767");
+        let str_minus_32768 = String::from("-32768");
+        let str_minus_21846 = String::from("-21846");
+        let str_minus_two = String::from("-2");
+        let str_minus_one = String::from("-1");
+
+        // Act
+        let res_zero = from_string_integer(str_zero).unwrap();
+        let res_plus_one = from_string_integer(str_plus_one).unwrap();
+        let res_plus_two = from_string_integer(str_plus_two).unwrap();
+        let res_plus_21845 = from_string_integer(str_plus_21845).unwrap();
+        let res_plus_32767 = from_string_integer(str_plus_32767).unwrap();
+        let res_minus_32768 = from_string_integer(str_minus_32768).unwrap();
+        let res_minus_21846 = from_string_integer(str_minus_21846).unwrap();
+        let res_minus_two = from_string_integer(str_minus_two).unwrap();
+        let res_minus_one = from_string_integer(str_minus_one).unwrap();
+
+        // Assert
+        assert_eq!(res_zero.as_array_b16, B16_0);
+        assert_eq!(res_plus_one.as_array_b16, B16_PLUS_1);
+        assert_eq!(res_plus_two.as_array_b16, B16_PLUS_2);
+        assert_eq!(res_plus_21845.as_array_b16, B16_PLUS_21845);
+        assert_eq!(res_plus_32767.as_array_b16, B16_PLUS_32767);
+        assert_eq!(res_minus_32768.as_array_b16, B16_MINUS_32768);
+        assert_eq!(res_minus_21846.as_array_b16, B16_MINUS_21846);
+        assert_eq!(res_minus_two.as_array_b16, B16_MINUS_2);
+        assert_eq!(res_minus_one.as_array_b16, B16_MINUS_1);
     }
 }
