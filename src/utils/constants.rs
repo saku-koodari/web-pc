@@ -77,10 +77,10 @@ pub mod i16_consts {
     ];
 
     /// 16-bit value:
-    /// - Integer -21845.
+    /// - Integer -21846.
     /// - Binary: 1010 1010 1010 1010
     /// - Hexadecimal: 0xAAAA
-    pub const B16_MINUS_21845: [bool; 16] = [
+    pub const B16_MINUS_21846: [bool; 16] = [
         false, true, false, true, false, true, false, true, false, true, false, true, false, true,
         false, true,
     ];
@@ -123,15 +123,15 @@ mod test {
 
     #[test]
     fn test_b16_consts() {
-        let zero = "0000000000000000";
-        let plus_1 = "0000000000000001";
-        let plus_2 = "0000000000000010";
-        let plus_21845 = "0101010101010101";
-        let plus_32767 = "0111111111111111";
-        let minus_32768 = "1000000000000000";
-        let minus_21845 = "1010101010101010";
-        let minus_2 = "1111111111111110";
-        let minus_1 = "1111111111111111";
+        let zero /* -------- */ = "0000000000000000";
+        let plus_1 /* ------ */ = "0000000000000001";
+        let plus_2 /* ------ */ = "0000000000000010";
+        let plus_21845 /* -- */ = "0101010101010101";
+        let plus_32767 /* -- */ = "0111111111111111";
+        let minus_32768 /* - */ = "1000000000000000";
+        let minus_21846 /* - */ = "1010101010101010";
+        let minus_2 /* ----- */ = "1111111111111110";
+        let minus_1 /* ----- */ = "1111111111111111";
 
         // for actual testing
         assert_eq!(b2str(i16_consts::B16_0), zero);
@@ -140,7 +140,7 @@ mod test {
         assert_eq!(b2str(i16_consts::B16_PLUS_21845), plus_21845);
         assert_eq!(b2str(i16_consts::B16_PLUS_32767), plus_32767);
         assert_eq!(b2str(i16_consts::B16_MINUS_32768), minus_32768);
-        assert_eq!(b2str(i16_consts::B16_MINUS_21845), minus_21845);
+        assert_eq!(b2str(i16_consts::B16_MINUS_21846), minus_21846);
         assert_eq!(b2str(i16_consts::B16_MINUS_2), minus_2);
         assert_eq!(b2str(i16_consts::B16_MINUS_1), minus_1);
     }

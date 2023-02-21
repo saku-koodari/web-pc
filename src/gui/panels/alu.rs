@@ -1,4 +1,4 @@
-use crate::utils::{self, convert::from_string};
+use crate::utils::{self, convert_old::from_string};
 
 pub struct AluData {
     // TODO: Is it possible to convert into i32?
@@ -58,7 +58,7 @@ pub fn panel_alu(
                 let output_b16 =
                     crate::pc::chips::adder::adder_rca_lsb_b16(a.bin_array, b.bin_array);
 
-                let output_i16 = utils::convert::from_b16(output_b16.0);
+                let output_i16 = utils::convert_old::from_b16(output_b16.0);
                 data.output = output_i16.to_string();
 
                 if output_b16.1 {

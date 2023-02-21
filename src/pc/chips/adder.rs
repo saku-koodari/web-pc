@@ -52,7 +52,7 @@ pub fn inc16(input: [bool; 16]) -> [bool; 16] {
 }
 
 mod tests {
-    use crate::utils::convert::ConvertResult;
+    use crate::utils::convert_old::ConvertResult;
 
     #[test]
     fn test_half_adder() {
@@ -81,7 +81,7 @@ mod tests {
     fn test_adder_rca_b16() {
         use crate::{
             pc::chips::adder::adder_rca_lsb_b16,
-            utils::convert::{from_b16, from_i16},
+            utils::convert_old::{from_b16, from_i16},
         };
 
         struct TestCase {
@@ -126,11 +126,11 @@ mod tests {
             let (res, overflow) = adder_rca_lsb_b16(case.input_a.bin_array, case.input_b.bin_array);
 
             // debug
-            print!(
-                "expected: {output}. actual: {res}.\n",
-                output = case.output,
-                res = from_b16(res)
-            );
+            // print!(
+            //     "expected: {output}. actual: {res}.\n",
+            //     output = case.output,
+            //     res = from_b16(res)
+            // );
 
             // assert
             assert_eq!(case.output.int_value, from_b16(res).int_value);
