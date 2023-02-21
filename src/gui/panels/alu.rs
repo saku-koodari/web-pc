@@ -2,13 +2,18 @@ use crate::utils::{self, convert::from_string_integer};
 
 pub struct AluData {
     // TODO: Is it possible to convert into i16?
-    input_a: String,
-    input_b: String,
-    preset_a: String,
-    preset_b: String,
-    selector: bool,
-    postselector: bool,
-    output: String,
+    input_x: String,
+    input_y: String,
+    input_zx: bool,
+    input_nx: bool,
+    input_zy: bool,
+    input_ny: bool,
+    input_f: bool,
+    input_no: bool,
+
+    output_out: String,
+    output_zr: bool,
+    output_ng: bool,
 
     error: String,
 }
@@ -16,13 +21,19 @@ pub struct AluData {
 impl Default for AluData {
     fn default() -> Self {
         Self {
-            input_a: "0".to_owned(),
-            input_b: "0".to_owned(),
-            preset_a: "0".to_owned(),
-            preset_b: "0".to_owned(),
-            selector: false,
-            postselector: false,
-            output: "0".to_owned(),
+            input_x: "0".to_owned(),
+            input_y: "0".to_owned(),
+            input_zx: false,
+            input_nx: false,
+            input_zy: false,
+            input_ny: false,
+            input_f: false,
+            input_no: false,
+
+            output_out: "0".to_owned(),
+            output_zr: false,
+            output_ng: false,
+
             error: "".to_owned(),
         }
     }
@@ -35,19 +46,66 @@ pub fn panel_alu(
     data: &mut AluData,
     frame: &mut eframe::Frame,
 ) {
-    let input_a = &mut data.input_a;
-    let input_b = &mut data.input_b;
-    let output = &mut data.output;
+    let input_x = &mut data.input_x;
+    let input_y = &mut data.input_y;
+
+    let input_zx = &mut data.input_zx;
+    let input_nx = &mut data.input_nx;
+    let input_zy = &mut data.input_zy;
+    let input_ny = &mut data.input_ny;
+    let input_f = &mut data.input_f;
+    let input_no = &mut data.input_no;
 
     ui.label("16-bit ALU");
+    ui.label("inputs:");
+
     ui.horizontal(|ui| {
-        ui.label("Input A:");
-        ui.add(egui::widgets::TextEdit::singleline(input_a));
+        ui.label("16-bit int - X:");
+        ui.add(egui::widgets::TextEdit::singleline(input_x));
     });
 
     ui.horizontal(|ui| {
-        ui.label("Input B:");
-        ui.add(egui::widgets::TextEdit::singleline(input_b));
+        ui.label("16-bit int - Y:");
+        ui.add(egui::widgets::TextEdit::singleline(input_y));
+    });
+
+    ui.horizontal(|ui| {
+        ui.label(" 1-bit zx:");
+        ui.horizontal(|ui| {
+            ui.radio_value(input_zx, None, "0");
+            if ui.radio(input_zx.is_some(), "1").clicked() {
+                *input_zx = Some(FontId::default());
+            }
+            if let Some(input_zx) = input_zx {
+                crate::introspection::font_id_ui(ui, input_zx);
+            }
+        });
+        ui.end_row();
+    });
+
+    ui.horizontal(|ui| {
+        ui.label(" 1-bit nx:");
+        ui.add(egui::widgets::TextEdit::singleline(input_nx));
+    });
+
+    ui.horizontal(|ui| {
+        ui.label(" 1-bit zy:");
+        ui.add(egui::widgets::TextEdit::singleline(input_zy));
+    });
+
+    ui.horizontal(|ui| {
+        ui.label(" 1-bit ny:");
+        ui.add(egui::widgets::TextEdit::singleline(input_ny));
+    });
+
+    ui.horizontal(|ui| {
+        ui.label(" 1-bit f:");
+        ui.add(egui::widgets::TextEdit::singleline(input_f));
+    });
+
+    ui.horizontal(|ui| {
+        ui.label(" 1-bit no:");
+        ui.add(egui::widgets::TextEdit::singleline(input_no));
     });
 
     if ui.button("Run").clicked() {
