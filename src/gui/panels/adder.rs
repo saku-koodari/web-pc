@@ -44,16 +44,10 @@ pub fn panel_adder(
 
         match result {
             Ok((a, b)) => {
-                let output_b16 = crate::pc::chips::adder::adder_rca_lsb_b16(a, b);
+                let output_b16 = crate::pc::chips::adder::adder_b16(a, b);
 
-                let output_i32 = utils::convert::from_b16(output_b16.0);
+                let output_i32 = utils::convert::from_b16(output_b16);
                 data.output = output_i32.unwrap().to_string(); // TODO: Do we need to check the error?
-
-                if output_b16.1 {
-                    data.error = "Overflow!".to_owned();
-                } else {
-                    data.error = "".to_owned();
-                }
             }
             Err(e) => {
                 data.error = e;

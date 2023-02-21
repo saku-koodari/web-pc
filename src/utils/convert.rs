@@ -22,7 +22,6 @@ pub fn from_b16(b16: [bool; 16]) -> Result<ConvertResult, String> {
     let int32_conversion = i32::from_str_radix(&as_string_bin, 2);
     if int32_conversion.is_err() {
         let error = int32_conversion.err().unwrap();
-
         return Err(format!(
             "Cannot convert '{}' into i16 value because {}",
             as_string_bin, error
@@ -44,7 +43,7 @@ pub fn from_i16(integer: i16) -> Result<ConvertResult, String> {
     let as_string_bin = format!("{:016b}", integer);
     println!("Conversion: 1/2 {integer} as string bin: {as_string_bin}");
 
-    let as_array_b16 = byte_string_to_b16(&as_string_bin);
+    let as_array_b16 = byte_string_to_b16(as_string_bin.to_owned());
     println!(
         "Conversion: 2/2 {integer} as byte array: {:?}",
         as_array_b16
@@ -80,7 +79,7 @@ fn b16_to_byte_string(b16: [bool; 16]) -> String {
     result
 }
 
-fn byte_string_to_b16(byte_string: &str) -> [bool; 16] {
+fn byte_string_to_b16(byte_string: String) -> [bool; 16] {
     let mut result = [false; 16];
     for (i, s) in byte_string.chars().rev().enumerate() {
         result[i] = s == '1';
