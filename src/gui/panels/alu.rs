@@ -1,7 +1,7 @@
 use crate::utils::{self, convert::from_string_integer};
 
 pub struct AluData {
-    // TODO: Is it possible to convert into i32?
+    // TODO: Is it possible to convert into i16?
     input_a: String,
     input_b: String,
     preset_a: String,
