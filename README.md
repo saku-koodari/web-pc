@@ -1,3 +1,10 @@
+# Web PC
+My attempt to build computer only using binary gates AND, NOT and combination of them.
+
+Runs on https://saku-kaarakainen.github.io/web-pc/
+
+_(The template readme is left here for possible debugging purposes)_
+
 # eframe template
 
 [![dependency status](https://deps.rs/repo/github/emilk/eframe_template/status.svg)](https://deps.rs/repo/github/emilk/eframe_template)
