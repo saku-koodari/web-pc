@@ -48,7 +48,6 @@ pub fn from_i16(integer: i16) -> Result<ConvertResult, String> {
         "Conversion: 2/2 {integer} as byte array: {:?}",
         as_array_b16
     );
-    println!("");
 
     Ok(ConvertResult {
         as_array_b16,
