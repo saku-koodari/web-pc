@@ -25,7 +25,7 @@ pub fn panel_not(
     data: &mut NotData,
     frame: &mut eframe::Frame,
 ) {
-    ui.label("16-bit Adder");
+    ui.label("16-bit NOT gate");
     ui.horizontal(|ui| {
         ui.label("Input:");
         ui.add(egui::widgets::TextEdit::singleline(&mut data.input));

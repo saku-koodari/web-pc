@@ -49,13 +49,6 @@ pub fn panel_alu(
     let input_x = &mut data.input_x;
     let input_y = &mut data.input_y;
 
-    let input_zx = &mut data.input_zx;
-    let input_nx = &mut data.input_nx;
-    let input_zy = &mut data.input_zy;
-    let input_ny = &mut data.input_ny;
-    let input_f = &mut data.input_f;
-    let input_no = &mut data.input_no;
-
     ui.label("16-bit ALU");
     ui.label("inputs:");
 
@@ -69,67 +62,34 @@ pub fn panel_alu(
         ui.add(egui::widgets::TextEdit::singleline(input_y));
     });
 
+    ui.horizontal(|ui| ui.label("Control bits:"));
+    ui.horizontal(|ui| ui.checkbox(&mut data.input_zx, "zx"));
+    ui.horizontal(|ui| ui.checkbox(&mut data.input_nx, "nx"));
+    ui.horizontal(|ui| ui.checkbox(&mut data.input_zy, "zy"));
+    ui.horizontal(|ui| ui.checkbox(&mut data.input_ny, "ny"));
+    ui.horizontal(|ui| ui.checkbox(&mut data.input_f, "f"));
+    ui.horizontal(|ui| ui.checkbox(&mut data.input_no, "no"));
+
+    if ui.button("Run").clicked() {}
+
+    ui.horizontal(|ui| ui.label("Result:"));
     ui.horizontal(|ui| {
-        ui.label(" 1-bit zx:");
-        ui.horizontal(|ui| {
-            ui.radio_value(input_zx, None, "0");
-            if ui.radio(input_zx.is_some(), "1").clicked() {
-                *input_zx = Some(FontId::default());
-            }
-            if let Some(input_zx) = input_zx {
-                crate::introspection::font_id_ui(ui, input_zx);
-            }
-        });
-        ui.end_row();
-    });
+        ui.label("out:");
 
-    ui.horizontal(|ui| {
-        ui.label(" 1-bit nx:");
-        ui.add(egui::widgets::TextEdit::singleline(input_nx));
-    });
-
-    ui.horizontal(|ui| {
-        ui.label(" 1-bit zy:");
-        ui.add(egui::widgets::TextEdit::singleline(input_zy));
-    });
-
-    ui.horizontal(|ui| {
-        ui.label(" 1-bit ny:");
-        ui.add(egui::widgets::TextEdit::singleline(input_ny));
-    });
-
-    ui.horizontal(|ui| {
-        ui.label(" 1-bit f:");
-        ui.add(egui::widgets::TextEdit::singleline(input_f));
-    });
-
-    ui.horizontal(|ui| {
-        ui.label(" 1-bit no:");
-        ui.add(egui::widgets::TextEdit::singleline(input_no));
-    });
-
-    if ui.button("Run").clicked() {
-        let result = from_string_integer(input_a.to_string())
-            .and_then(|a| from_string_integer(input_b.to_string()).map(|b| (a, b)));
-
-        match result {
-            Ok((a, b)) => {
-                let output_b16 = crate::pc::chips::adder::adder_b16(a.as_array_b16, b.as_array_b16);
-
-                let output_i16 = utils::convert::from_b16(output_b16);
-                data.output = output_i16.unwrap().to_string(); // TODO: Do we need to check the error?
+        let label_result = utils::convert::from_string_integer(data.output_out.clone());
+        match label_result {
+            Ok(a) => {
+                ui.label(a.to_string());
             }
             Err(e) => {
-                data.error = e;
-                return;
+                ui.label(format!("Error: {}", e));
             }
         }
-    }
-
-    ui.horizontal(|ui| {
-        ui.label("Result:");
-        ui.add(egui::widgets::Label::new(format!("{}", data.output)));
     });
+
+    // output_out: String,
+    // output_zr: bool,
+    // output_ng: bool,
 
     ui.horizontal(|ui| {
         if data.error != "" {
