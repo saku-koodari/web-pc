@@ -73,23 +73,51 @@ pub fn panel_alu(
     if ui.button("Run").clicked() {}
 
     ui.horizontal(|ui| ui.label("Result:"));
-    ui.horizontal(|ui| {
-        ui.label("out:");
 
-        let label_result = utils::convert::from_string_integer(data.output_out.clone());
-        match label_result {
-            Ok(a) => {
-                ui.label(a.to_string());
-            }
-            Err(e) => {
-                ui.label(format!("Error: {}", e));
-            }
+    let label_result = utils::convert::from_string_integer(data.output_out.clone());
+    match label_result {
+        Ok(a) => {
+            ui.horizontal(|ui| {
+                // output_zr: bool,
+                ui.label("zr:");
+                ui.label(data.output_zr.to_string());
+
+                // output_ng: bool,
+                ui.label("ng:");
+                ui.label(data.output_ng.to_string());
+            });
+
+            ui.horizontal(|ui| {
+                // output_out: String,
+                ui.label("16-bit out (int):");
+                ui.label(a.as_integer.to_string());
+            });
+
+            ui.horizontal(|ui| {
+                // output_out: String,
+                ui.label("16-bit out (hex):");
+                ui.label(a.as_string_hex.to_string());
+            });
+
+            ui.horizontal(|ui| {
+                // output_out: String,
+                ui.label("16-bit out (bin):");
+                ui.label(a.as_string_bin.to_string());
+            });
+
+            ui.horizontal(|ui| {
+                // output_out: String,
+                ui.label("16-bit out (internal b16):");
+                ui.label(format!("{:?}", a.as_array_b16));
+            });
         }
-    });
 
-    // output_out: String,
-    // output_zr: bool,
-    // output_ng: bool,
+        Err(e) => {
+            ui.horizontal(|ui| {
+                ui.label(format!("Error: {}", e));
+            });
+        }
+    }
 
     ui.horizontal(|ui| {
         if data.error != "" {

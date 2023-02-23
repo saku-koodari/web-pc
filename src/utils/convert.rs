@@ -41,13 +41,7 @@ pub fn from_b16(b16: [bool; 16]) -> Result<ConvertResult, String> {
 
 pub fn from_i16(integer: i16) -> Result<ConvertResult, String> {
     let as_string_bin = format!("{:016b}", integer);
-    println!("Conversion: 1/2 {integer} as string bin: {as_string_bin}");
-
     let as_array_b16 = byte_string_to_b16(as_string_bin.to_owned());
-    println!(
-        "Conversion: 2/2 {integer} as byte array: {:?}",
-        as_array_b16
-    );
 
     Ok(ConvertResult {
         as_array_b16,
@@ -55,6 +49,20 @@ pub fn from_i16(integer: i16) -> Result<ConvertResult, String> {
         as_string_hex: format!("0x{:04X}", integer),
         as_string_bin,
     })
+}
+
+pub fn from_string_binary(str: String) -> Result<ConvertResult, String> {
+    if str.len() != 16 {
+        return Err(format!("Cannot convert '{str}' binary into i16 value because it is not 16 bits long. It is {len} bits long.", str=str, len=str.len()));
+    }
+
+    if !str.chars().all(|c| c == '0' || c == '1') {
+        return Err(format!("Cannot convert '{str}' binary into i16 value because it contains non-binary characters.", str=str));
+    }
+
+    // 1110 1011 1000 0110
+    let b16 = byte_string_to_b16(str);
+    from_b16(b16)
 }
 
 pub fn from_string_integer(str: String) -> Result<ConvertResult, String> {
