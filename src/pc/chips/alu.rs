@@ -91,12 +91,9 @@ pub fn alu(
 }
 
 mod tests {
-    // unit tests for ALU (arithmatic logic unit)
-
-    use std::collections::HashMap;
-
     use crate::utils::convert::{from_i16, from_string_binary};
 
+    // unit tests for ALU (arithmatic logic unit)
     fn i16_to_b16(i: i16) -> [bool; 16] {
         from_i16(i).unwrap().as_array_b16
     }
@@ -105,94 +102,63 @@ mod tests {
         from_string_binary(s).unwrap().as_array_b16
     }
 
-
-
-
-    fn b(i: i16) -> bool {
-        i == 1
-    }
-
-
-
     // tests are not fully convered, because there are too many cases to test
     // that's why there's an UI to test the ALU
     // TODO: Make test cases for all opcodes, but using static x and y values (then out can be also static)
     #[test]
     fn test_alu_test_cases_1() {
         use crate::pc::chips::alu::alu;
-
-
-        let input_x = bin_str_to_b16(String::from("1110101110000110")); // -5242
-        let input_y = bin_str_to_b16(String::from("0001100001101101")); // 6253
-
-        let negation_input_x = bin_str_to_b16(String::from("0001010001111001"));
-        let negation_input_x = bin_str_to_b16(String::from("1110011110010010"));
+        use crate::utils::opcodes::{get_opcodes, AluControlBits, Opcode};
+        use std::collections::HashMap;
 
         struct TestCase {
-            arrange_x: [bool; 16],
-            arrange_y: [bool; 16],
-            arrange_zx: bool,
-            arrange_nx: bool,
-            arrange_zy: bool,
-            arrange_ny: bool,
-            arrange_f: bool,
-            arrange_no: bool,
+            opcode: Option<AluControlBits>,
 
             assert_out: [bool; 16],
             assert_zr: bool,
             assert_ng: bool,
         }
 
-        let test_cases = vec![
-            TestCase {
-                arrange_x: i16_to_b16(30),
-                arrange_y: i16_to_b16(20),
+        let negation_input_x = bin_str_to_b16(String::from("0001010001111001"));
+        let negation_input_x = bin_str_to_b16(String::from("1110011110010010"));
 
-                arrange_zx: false,
-                arrange_nx: false,
-                arrange_zy: false,
-                arrange_ny: true,
-                arrange_f: true,
-                arrange_no: true,
+        // type: HashMap<Opcode, AluControlBits>
+        let opcodes = get_opcodes();
 
-                assert_out: i16_to_b16(-10),
-                assert_zr: false,
-                assert_ng: true,
-            },
-            TestCase {
-                arrange_x: input_x,
-                arrange_y: input_y,
-
-                // row 17: x&y
-                arrange_zx: false,
-                arrange_nx: false,
-                arrange_zy: false,
-                arrange_ny: false,
-                arrange_f: false,
-                arrange_no: false,
-
-                assert_out: bin_str_to_b16(String::from("0000100000000100")),
-                assert_zr: false,
-                assert_ng: false,
-            },
-        ];
+        let test_cases = vec![TestCase {
+            opcode: opcodes.get(&Opcode::XAndY).cloned(),
+            assert_out: bin_str_to_b16(String::from("0000000000000000")),
+            assert_zr: true,
+            assert_ng: false,
+        }];
 
         // loop test cases
         for test_case in test_cases {
-            let actual_resul = alu(
-                test_case.arrange_x,
-                test_case.arrange_y,
-                test_case.arrange_zx,
-                test_case.arrange_nx,
-                test_case.arrange_zy,
-                test_case.arrange_ny,
-                test_case.arrange_f,
-                test_case.arrange_no,
+            let input_x = bin_str_to_b16(String::from("1110101110000110")); // -5242
+            let input_y = bin_str_to_b16(String::from("0001100001101101")); // 6253
+
+            let alu_control_bits = test_case.opcode.unwrap();
+
+            let actual_result = alu(
+                input_x,
+                input_x,
+                alu_control_bits.zx,
+                alu_control_bits.nx,
+                alu_control_bits.zy,
+                alu_control_bits.ny,
+                alu_control_bits.f,
+                alu_control_bits.no,
             );
 
-            assert_eq!(actual_resul.0, test_case.assert_out);
-            assert_eq!(actual_resul.1, test_case.assert_zr);
-            assert_eq!(actual_resul.2, test_case.assert_ng);
+            let possibleErrorMessage = format!(
+                "expected: {:?}\n \
+                actual: {:?}",
+                test_case.assert_out, actual_result.0
+            );
+
+            assert_eq!(actual_result.0, test_case.assert_out, possibleErrorMessage);
+            assert_eq!(actual_result.1, test_case.assert_zr);
+            assert_eq!(actual_result.2, test_case.assert_ng);
         }
     }
 }
