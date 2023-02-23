@@ -1,0 +1,16 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "op_generator.js",
+  "scripts": {
+    "start": "node op_generator.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "fs": "^0.0.1-security"
+  }
+}

@@ -93,6 +93,8 @@ pub fn alu(
 mod tests {
     // unit tests for ALU (arithmatic logic unit)
 
+    use std::collections::HashMap;
+
     use crate::utils::convert::{from_i16, from_string_binary};
 
     fn i16_to_b16(i: i16) -> [bool; 16] {
@@ -103,44 +105,14 @@ mod tests {
         from_string_binary(s).unwrap().as_array_b16
     }
 
-    //
-    // meaning of the control bits:
-    // zx: set x to zero
-    // nx: negates x
-    // zy: set y to zero
-    // ny: negates y
-    // f: function selector
-    // out: output of the function
-    //
-    // preset-x: pre-setting the x input
-    // preset-y: pre-setting the y input
-    // sel: selecting between computing + or &
-    // post: post-setting the output
-    // out: Reslting ALU output
-    // -----------------------------------
-    // zx:  if zx then x=0
-    // nx:  if nx then x=!x
-    // zy:  if zy then y=0
-    // ny:  if ny then y=!y
-    // f:   if f then out=x+y else out=x&y
-    // no:  if no then out=!out
-    // out: out(x,y)=
-    // -----------------------------------
-    // ALU also outputs zr and ng
-    // zr: if out=0 then zr=1 else zr=0
-    // ng: if out<0 then ng=1 else ng=0
 
-    // 4-bit Example: (row 6 out= !x)
-    // x: 1 1 0 0
-    // y: 1 0 1 1
-    //
-    // Following pre-setting:
-    // x: 1 1 0 0
-    // y: 1 1 1 1
-    //
-    // Computing and post-setting:
-    // x&y: 1 1 0 0
-    // !(x&y): 0 0 1 1
+
+
+    fn b(i: i16) -> bool {
+        i == 1
+    }
+
+
 
     // tests are not fully convered, because there are too many cases to test
     // that's why there's an UI to test the ALU
@@ -148,48 +120,6 @@ mod tests {
     #[test]
     fn test_alu_test_cases_1() {
         use crate::pc::chips::alu::alu;
-
-        // ControlBits
-        struct Cb {
-            zx: bool,
-            nx: bool,
-            zy: bool,
-            ny: bool,
-            f: bool,
-            no: bool,
-            name: string,
-        }
-
-/*
-        let opcodes = vec![
-       // +----+----------+----------+----------+----------+---------+----------+-----+
-       // | ## |    zx    |    nx    |    zy    |    ny    |    f    |    no    | out |
-       // +----+----------+----------+----------+----------+---------+----------+-----+
-       // | 01 |     1    |     0    |     1    |     0    |    1    |     0    |  0  | 
-       Cb      { zx: false, nx: false, zy: false, ny: false, f: false, no: false, name: "0" },
-       
-       // | 02 |     1    |     1    |     1    |     1    |    1    |     1    |  1  |
-       Cb      { zx: true , nx: true , zy: true , ny: true, f: true  , no: true , name: "1" },
-
-       // | 03 |     1    |     1    |     1    |     0    |    1    |     0    | -1  |
-       // | 04 |     0    |     0    |     1    |     1    |    0    |     0    |  x  |
-       // | 05 |     1    |     1    |     0    |     0    |    0    |     0    |  y  |
-       // | 06 |     0    |     0    |     1    |     1    |    0    |     1    | !x  |
-       // | 07 |     1    |     1    |     0    |     0    |    0    |     1    | !y  |
-       // | 08 |     0    |     0    |     1    |     1    |    1    |     1    | -x  |
-       // | 09 |     1    |     1    |     0    |     0    |    1    |     1    | -y  |
-       // | 10 |     0    |     1    |     1    |     1    |    1    |     1    | x+1 |
-       // | 11 |     1    |     1    |     0    |     1    |    1    |     1    | y+1 |
-       // | 12 |     0    |     0    |     1    |     1    |    1    |     0    | x-1 |
-       // | 13 |     1    |     1    |     0    |     0    |    1    |     0    | y-1 |
-       // | 14 |     0    |     0    |     0    |     0    |    1    |     0    | x+y |
-       // | 15 |     0    |     1    |     0    |     0    |    1    |     1    | x-y |
-       // | 16 |     0    |     0    |     0    |     1    |    1    |     1    | y-x |
-       // | 17 |     0    |     0    |     0    |     0    |    0    |     0    | x&y |
-       // | 18 |     0    |     1    |     0    |     1    |    0    |     1    | y|y |
-        ]
-*/
-        }
 
 
         let input_x = bin_str_to_b16(String::from("1110101110000110")); // -5242
