@@ -1,7 +1,28 @@
+// Script to generate Rust code
 const fs = require("fs");
 const csv = require("csv-parser");
+const Handlebars = require("handlebars");
 
-const results = [];
+const opcodes_rust_template_variables = {
+  now: new Date().toISOString(),
+  templateFileName: "opcodes.handlebars",
+  csvDataFileName: "codes.csv",
+
+  opcodes_enum: [],
+  opcodes_hasmap_inserts: [],
+};
+
+const opcodes_rust_template_str = fs.readFileSync(
+  opcodes_rust_template_variables.templateFileName,
+  "utf8"
+);
+
+Handlebars.registerHelper("escape", function (variable) {
+  return variable.replace(/(['"])/g, "\\$1");
+});
+const opcodes_rust_template = Handlebars.compile(opcodes_rust_template_str);
+
+const csvData = [];
 
 const outToEnum = (out) => {
   return out
@@ -20,40 +41,30 @@ const outToEnum = (out) => {
     .replace("_", "");
 };
 
-fs.createReadStream("codes.csv")
+fs.createReadStream(opcodes_rust_template_variables.csvDataFileName)
   .pipe(csv())
-  .on("data", (data) => results.push(data))
+  .on("data", (data_row) => csvData.push(data_row))
   .on("end", () => {
-    console.log("pub enum Opcode {");
-    const opcodes = results.map((r) => {
-      console.log("  " + outToEnum(r.out) + ",");
-    });
-    console.log("}");
-    console.log("");
+    csvData.forEach((row) => {
+      opcodes_rust_template_variables.opcodes_enum.push(outToEnum(row.out));
 
-    const parsed = results.map((r) => {
-      const nr = r.nr;
-      const zx = r.zx;
-      const nx = r.nx;
-      const zy = r.zy;
-      const ny = r.ny;
-      const f = r.f;
-      const no = r.no;
-      const out = r.out;
-      /////////////////
+      const nr = row.nr;
+      const zx = row.zx;
+      const nx = row.nx;
+      const zy = row.zy;
+      const ny = row.ny;
+      const f = row.f;
+      const no = row.no;
+      const out = row.out;
+
       const number_int = +nr + +zx + +nx + +zy + +ny + +f + +no;
+
+      const name = outToEnum(out);
+
       const int = number_int.toString();
       const bin = number_int.toString(2);
       const hex = "0x" + number_int.toString(4);
-
-      console.log(
-        `opcodes.insert(Opcode::${outToEnum(
-          out
-        )}, AluControlBits {zx:${zx},nx:${nx},zy:${zy},ny:${ny},f:${f},no:${no},` +
-          `int:String::from("${int}"), hex:String::from("${hex}"), bin:String::from("${bin}")});`
-      );
-
-      return {
+      opcodes_rust_template_variables.opcodes_hasmap_inserts.push({
         nr,
         zx,
         nx,
@@ -61,14 +72,20 @@ fs.createReadStream("codes.csv")
         ny,
         f,
         no,
+        name,
         out,
         int,
         bin,
         hex,
-      };
+      });
     });
 
-    console.log("");
+    const opcodes_rust_template_result = opcodes_rust_template(
+      opcodes_rust_template_variables
+    );
+    console.log(opcodes_rust_template_result);
+    fs.writeFileSync("generated/opcodes.rs", opcodes_rust_template_result);
+    console.log("-- end of read codes.csv with parser --");
   });
 
-console.log("");
+// this code line is most likely to be excuted before csvParser ends.
