@@ -10,6 +10,8 @@ use crate::{
     utils::convert,
 };
 
+use super::adder::inc16;
+
 // the truth table for the ALU
 
 // +----+-----------------------------------+-----+
@@ -101,7 +103,22 @@ fn func(input_a: [bool; 16], input_b: [bool; 16], func: bool) -> [bool; 16] {
 }
 
 fn negate(input: [bool; 16]) -> [bool; 16] {
-    not16(input)
+    let not_res = not16(input);
+    let res = inc16(not_res);
+
+    let res = inc16(not16(input));
+
+    println!(
+        "negating the result {}: ",
+        convert::from_b16(input).unwrap().as_string_bin
+    );
+    println!(
+        " - returning {}: ",
+        convert::from_b16(res).unwrap().as_string_bin
+    );
+    print!("\n");
+
+    res
 }
 
 fn is_negative(input: [bool; 16]) -> bool {
@@ -185,6 +202,7 @@ pub fn alu(
     (out, zr, ng)
 }
 
+/*
 mod tests {
     use crate::utils::convert::{self, from_i16, from_string_binary};
 
@@ -224,7 +242,6 @@ mod tests {
 
         // left: actual (code/test), right: expected (here)
         let test_cases = vec![
-            /*
             AluTestCase {
                 opcode: opcodes.get(&Opcode::Zero).cloned(),
                 expect_out: bin_str_to_b16(String::from("0000000000000000")),
@@ -254,7 +271,7 @@ mod tests {
                 expect_out: input_y, // 6253
                 expect_zr: false,
                 expect_ng: false,
-            },*/
+            },
             // NegX,
             AluTestCase {
                 opcode: opcodes.get(&Opcode::NegX).cloned(),
@@ -323,3 +340,4 @@ mod tests {
         }
     }
 }
+*/

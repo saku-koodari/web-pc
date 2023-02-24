@@ -81,7 +81,7 @@ mod tests {
     }
 
     #[test]
-    fn test_adder_rca_b16() {
+    fn test_adder_b16() {
         use crate::{
             pc::chips::adder::adder_b16,
             utils::convert::{from_b16, from_i16},
@@ -147,6 +147,68 @@ mod tests {
 
             // debug
             print!("Test passed.\n");
+        }
+    }
+
+    fn test_inc16() {
+        use crate::{
+            pc::chips::adder::inc16,
+            utils::convert::{from_b16, from_i16},
+        };
+
+        struct TestCase {
+            input: Result<ConvertResult, String>,
+            output: Result<ConvertResult, String>,
+            name: String,
+        }
+
+        // arrange
+        let test_cases = vec![
+            TestCase {
+                input: from_i16(0),
+                output: from_i16(1),
+                name: String::from("test 1: 0 + 1 = 1"),
+            },
+            TestCase {
+                input: from_i16(1),
+                output: from_i16(2),
+                name: String::from("test 2: 1 + 1 = 2"),
+            },
+            TestCase {
+                input: from_i16(5),
+                output: from_i16(6),
+                name: String::from("test 4: 5 + 1 = 6"),
+            },
+            TestCase {
+                input: from_i16(-1),
+                output: from_i16(0),
+                name: String::from("test 5: -1 + 1 = 0"),
+            },
+            TestCase {
+                input: from_i16(-5),
+                output: from_i16(-4),
+                name: String::from("test 6: -5 + 1 = -4"),
+            },
+        ];
+
+        for case in test_cases {
+            print!("\ntesting {n}...\n", n = case.name);
+
+            let input = case.input.unwrap();
+
+            println!("input: {input}");
+
+            // act
+            let res = inc16(input.as_array_b16);
+
+            let expected = case.output.unwrap().as_integer;
+            let actual = from_b16(res).unwrap().as_integer;
+
+            assert_eq!(expected, actual);
+
+            // debug
+            // print!(
+            //     "expected: {output}. actual: {res}.\n",
         }
     }
 
