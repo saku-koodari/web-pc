@@ -100,13 +100,17 @@ fn func(input_a: [bool; 16], input_b: [bool; 16], func: bool) -> [bool; 16] {
     res
 }
 
+fn negate(input: [bool; 16]) -> [bool; 16] {
+    not16(input)
+}
+
 fn is_negative(input: [bool; 16]) -> bool {
     let is_it = input[15];
     is_it
 }
 
 fn is_zero(input: [bool; 16]) -> bool {
-    or16way(input)
+    not(or16way(input))
 }
 
 // our ALU can't do multiplication or division
@@ -156,7 +160,7 @@ pub fn alu(
 
     let out3 = func(out1, out2, f);
 
-    let out = mux16(out3, not16(out3), no);
+    let out = mux16(out3, negate(out3), no);
     let ng = is_negative(out);
     let zr = is_zero(out);
 
@@ -182,7 +186,7 @@ pub fn alu(
 }
 
 mod tests {
-    use crate::utils::convert::{from_i16, from_string_binary};
+    use crate::utils::convert::{self, from_i16, from_string_binary};
 
     // unit tests for ALU (arithmatic logic unit)
     fn i16_to_b16(i: i16) -> [bool; 16] {
@@ -209,39 +213,77 @@ mod tests {
             opcode: Option<AluControlBits>,
 
             expect_out: [bool; 16],
-            expect_zr: bool,
-            expect_ng: bool,
+            expect_zr: bool, // zero result
+            expect_ng: bool, // negative result
         }
+
+        let input_x = bin_str_to_b16(String::from("1110101110000110")); // -5242
+        let input_y = bin_str_to_b16(String::from("0001100001101101")); // 6253
 
         let opcodes = get_opcodes();
 
         // left: actual (code/test), right: expected (here)
         let test_cases = vec![
+            /*
             AluTestCase {
                 opcode: opcodes.get(&Opcode::Zero).cloned(),
                 expect_out: bin_str_to_b16(String::from("0000000000000000")),
                 expect_zr: true,
-                expect_ng: true, // alu returns negative here. is it ok?
-            }, /*
-               AluTestCase {
-                   opcode: opcodes.get(&Opcode::One).cloned(),
-                   expect_out: bin_str_to_b16(String::from("1111111111111111")),
-                   expect_zr: false,
-                   expect_ng: true,
-               },*/
+                expect_ng: false, // alu returns negative here. is it ok?
+            },
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::One).cloned(),
+                expect_out: bin_str_to_b16(String::from("0000000000000001")),
+                expect_zr: false,
+                expect_ng: false,
+            },
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::MinusOne).cloned(),
+                expect_out: bin_str_to_b16(String::from("1111111111111111")),
+                expect_zr: false,
+                expect_ng: true,
+            },
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::X).cloned(),
+                expect_out: input_x, // -5242
+                expect_zr: false,
+                expect_ng: true,
+            },
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::Y).cloned(),
+                expect_out: input_y, // 6253
+                expect_zr: false,
+                expect_ng: false,
+            },*/
+            // NegX,
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::NegX).cloned(),
+                expect_out: convert::from_i16(5242).unwrap().as_array_b16, // -5242
+                expect_zr: false,
+                expect_ng: false,
+            },
+            // NegY,
+            // MinusX,
+            // MinusY,
+            // XPlusOne,
+            // YPlusOne,
+            // XMinusOne,
+            // YMinusOne,
+            // XPlusY,
+            // XMinusY,
+            // YMinusX,
+            // XAndY,
+            // YOrY,
         ];
 
         // loop test cases
         for test_case in test_cases {
-            let input_x = bin_str_to_b16(String::from("1110101110000110")); // -5242
-            let input_y = bin_str_to_b16(String::from("0001100001101101")); // 6253
-
             let alu_control_bits = test_case.opcode.unwrap();
             println!("TESTING: '{}'", alu_control_bits.name);
 
             let actual_result = alu(
                 input_x,
-                input_x,
+                input_y,
                 alu_control_bits.zx,
                 alu_control_bits.nx,
                 alu_control_bits.zy,
@@ -268,8 +310,16 @@ mod tests {
             print!("\n");
             println!("asserting...");
             assert_eq!(actual_out.as_integer, expected_out.as_integer);
-            assert_eq!(actual_result.1, test_case.expect_zr, "zero result");
-            assert_eq!(actual_result.2, test_case.expect_ng, "negative result");
+            assert_eq!(
+                actual_result.1, test_case.expect_zr,
+                "\n ----- ZERO RESULT - expected: {}, actual: {}\n\n",
+                test_case.expect_zr, actual_result.1
+            );
+            assert_eq!(
+                actual_result.2, test_case.expect_ng,
+                "\n ----- NEGATIVE RESULT - expected: {}, actual: {}\n\n",
+                test_case.expect_ng, actual_result.2
+            );
         }
     }
 }
