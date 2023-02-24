@@ -19,13 +19,13 @@ impl Default for NotData {
 }
 
 pub fn panel_not(
-    ctx: &Context,
+    _ctx: &Context,
     ui: &mut egui::Ui,
     label: &mut String,
     data: &mut NotData,
-    frame: &mut eframe::Frame,
+    _frame: &mut eframe::Frame,
 ) {
-    ui.label("16-bit NOT gate");
+    ui.label(label.clone());
     ui.horizontal(|ui| {
         ui.label("Input:");
         ui.add(egui::widgets::TextEdit::singleline(&mut data.input));

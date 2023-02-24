@@ -44,12 +44,12 @@ pub fn panel_alu(
     ui: &mut egui::Ui,
     label: &mut String,
     data: &mut AluData,
-    frame: &mut eframe::Frame,
+    _frame: &mut eframe::Frame,
 ) {
     let input_x = &mut data.input_x;
     let input_y = &mut data.input_y;
 
-    ui.label("16-bit ALU");
+    ui.label(label.clone());
     ui.label("inputs:");
 
     ui.horizontal(|ui| {

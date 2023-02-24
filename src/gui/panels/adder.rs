@@ -24,9 +24,9 @@ pub fn panel_adder(
     ui: &mut egui::Ui,
     label: &mut String,
     data: &mut AdderData,
-    frame: &mut eframe::Frame,
+    _frame: &mut eframe::Frame,
 ) {
-    ui.label("16-bit Adder");
+    ui.label(label.clone());
     ui.horizontal(|ui| {
         ui.label("Input A:");
         ui.add(egui::widgets::TextEdit::singleline(&mut data.input_a));

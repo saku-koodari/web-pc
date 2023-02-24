@@ -46,13 +46,13 @@ fs.createReadStream(opcodes_rust_template_variables.csvDataFileName)
       const currentOpCodeEnum = outToEnum(row.out);
       opcodes_rust_template_variables.opcodes_enum.push(currentOpCodeEnum);
 
-      const nr = !!row.nr;
-      const zx = !!row.zx;
-      const nx = !!row.nx;
-      const zy = !!row.zy;
-      const ny = !!row.ny;
-      const f = !!row.f;
-      const no = !!row.no;
+      const nr = row.nr;
+      const zx = row.zx === "1" ? true : false;
+      const nx = row.nx === "1" ? true : false;
+      const zy = row.zy === "1" ? true : false;
+      const ny = row.ny === "1" ? true : false;
+      const f = row.f === "1" ? true : false;
+      const no = row.no === "1" ? true : false;
       const out = row.out;
 
       const number_int = +nr + +zx + +nx + +zy + +ny + +f + +no;

@@ -1,5 +1,6 @@
 use std::fmt;
 
+#[derive(Debug)]
 pub struct ConvertResult {
     pub as_array_b16: [bool; 16],
     pub as_integer: i16,
