@@ -106,16 +106,11 @@ fn negate(input: [bool; 16]) -> [bool; 16] {
     let not_res = not16(input);
     let res = inc16(not_res);
 
-    let res = inc16(not16(input));
-
     println!(
         "negating the result {}: ",
-        convert::from_b16(input).unwrap().as_string_bin
+        convert::from_b16(input).unwrap()
     );
-    println!(
-        " - returning {}: ",
-        convert::from_b16(res).unwrap().as_string_bin
-    );
+    println!(" - returning {}: ", convert::from_b16(res).unwrap());
     print!("\n");
 
     res
@@ -202,7 +197,6 @@ pub fn alu(
     (out, zr, ng)
 }
 
-/*
 mod tests {
     use crate::utils::convert::{self, from_i16, from_string_binary};
 
@@ -340,4 +334,3 @@ mod tests {
         }
     }
 }
-*/
