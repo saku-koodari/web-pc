@@ -26,10 +26,10 @@ pub struct AluControlBits {
     pub ny: bool,
     pub f: bool,
     pub no: bool,
-    pub int: str,
-    pub hex: str,
-    pub bin: str,
-    pub name: str,
+    pub int: String,
+    pub hex: String,
+    pub bin: String,
+    pub name: String,
 }
 
 impl fmt::Display for AluControlBits {
@@ -57,7 +57,7 @@ pub fn get_opcodes() -> HashMap<Opcode, AluControlBits> {
 
     {{#each opcodes_hasmap_inserts}}
     opcodes.insert(
-        Opcode::Zero,
+        Opcode::{{currentOpCodeEnum}},
         AluControlBits {
             zx: {{zx}},
             nx: {{nx}},
@@ -65,10 +65,10 @@ pub fn get_opcodes() -> HashMap<Opcode, AluControlBits> {
             ny: {{ny}},
             f: {{f}},
             no: {{no}},
-            name: "{{name}}",
-            int: "{{int}}",
-            hex: "{{hex}}",
-            bin: "{{bin}}",
+            name: String::from("{{name}}"),
+            int:  String::from("{{int}}"),
+            hex:  String::from("{{hex}}"),
+            bin:  String::from("{{bin}}"),
         },
     );
     {{/each}}

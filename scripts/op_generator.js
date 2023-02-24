@@ -17,9 +17,6 @@ const opcodes_rust_template_str = fs.readFileSync(
   "utf8"
 );
 
-Handlebars.registerHelper("escape", function (variable) {
-  return variable.replace(/(['"])/g, "\\$1");
-});
 const opcodes_rust_template = Handlebars.compile(opcodes_rust_template_str);
 
 const csvData = [];
@@ -46,25 +43,26 @@ fs.createReadStream(opcodes_rust_template_variables.csvDataFileName)
   .on("data", (data_row) => csvData.push(data_row))
   .on("end", () => {
     csvData.forEach((row) => {
-      opcodes_rust_template_variables.opcodes_enum.push(outToEnum(row.out));
+      const currentOpCodeEnum = outToEnum(row.out);
+      opcodes_rust_template_variables.opcodes_enum.push(currentOpCodeEnum);
 
-      const nr = row.nr;
-      const zx = row.zx;
-      const nx = row.nx;
-      const zy = row.zy;
-      const ny = row.ny;
-      const f = row.f;
-      const no = row.no;
+      const nr = !!row.nr;
+      const zx = !!row.zx;
+      const nx = !!row.nx;
+      const zy = !!row.zy;
+      const ny = !!row.ny;
+      const f = !!row.f;
+      const no = !!row.no;
       const out = row.out;
 
       const number_int = +nr + +zx + +nx + +zy + +ny + +f + +no;
 
       const name = outToEnum(out);
-
       const int = number_int.toString();
       const bin = number_int.toString(2);
       const hex = "0x" + number_int.toString(4);
       opcodes_rust_template_variables.opcodes_hasmap_inserts.push({
+        currentOpCodeEnum,
         nr,
         zx,
         nx,
