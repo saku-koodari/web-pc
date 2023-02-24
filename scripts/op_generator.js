@@ -44,7 +44,6 @@ fs.createReadStream(opcodes_rust_template_variables.csvDataFileName)
   .on("end", () => {
     csvData.forEach((row) => {
       const currentOpCodeEnum = outToEnum(row.out);
-      opcodes_rust_template_variables.opcodes_enum.push(currentOpCodeEnum);
 
       const nr = row.nr;
       const zx = row.zx === "1" ? true : false;
@@ -61,6 +60,15 @@ fs.createReadStream(opcodes_rust_template_variables.csvDataFileName)
       const int = number_int.toString();
       const bin = number_int.toString(2);
       const hex = "0x" + number_int.toString(4);
+
+      const opCodeEnumField = {
+        field: name,
+        int,
+        hex,
+        bin,
+      };
+
+      opcodes_rust_template_variables.opcodes_enum.push(opCodeEnumField);
       opcodes_rust_template_variables.opcodes_hasmap_inserts.push({
         currentOpCodeEnum,
         nr,

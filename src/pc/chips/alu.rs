@@ -18,28 +18,28 @@ use super::adder::inc16;
 // |    |            control bits           | out |
 // +----+-----------------------------------+-----+
 // |    | preset-x  | preset-y  | sel |post | out |
-// +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-------+
-// | ## | zx  | nx  | zy  | ny  |  f  | no  | out | => |  6-bit = opcodes | instr |
-// +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-------+
-// | 01 |  1  |  0  |  1  |  0  |  1  |  0  |  0  |    | 101010 =    2A   | reset |
-// | 02 |  1  |  1  |  1  |  1  |  1  |  1  |  1  |    | 111111 =    3F   | fill  |
-// | 03 |  1  |  1  |  1  |  0  |  1  |  0  | -1  |    | 111010 =    3E   | neg   |
-// | 04 |  0  |  0  |  1  |  1  |  0  |  0  |  x  |    | 001100 =    0C   | x     |
-// | 05 |  1  |  1  |  0  |  0  |  0  |  0  |  y  |    | 110000 =    30   | y     |
-// | 06 |  0  |  0  |  1  |  1  |  0  |  1  | !x  |    | 001101 =    0D   | negx  |
-// | 07 |  1  |  1  |  0  |  0  |  0  |  1  | !y  |    | 110001 =    31   | negy  |
-// | 08 |  0  |  0  |  1  |  1  |  1  |  1  | -x  |    | 001111 =    0F   | xsub  |
-// | 09 |  1  |  1  |  0  |  0  |  1  |  1  | -y  |    | 110011 =    33   | ysub  |
-// | 10 |  0  |  1  |  1  |  1  |  1  |  1  | x+1 |    | 011111 =    1F   | plux  |
-// | 11 |  1  |  1  |  0  |  1  |  1  |  1  | y+1 |    | 110111 =    37   | pluy  |
-// | 12 |  0  |  0  |  1  |  1  |  1  |  0  | x-1 |    | 001110 =    0E   | subx  |
-// | 13 |  1  |  1  |  0  |  0  |  1  |  0  | y-1 |    | 110010 =    32   | suby  |
-// | 14 |  0  |  0  |  0  |  0  |  1  |  0  | x+y |    | 000010 =    02   | add   |
-// | 15 |  0  |  1  |  0  |  0  |  1  |  1  | x-y |    | 010011 =    13   | sub   |
-// | 16 |  0  |  0  |  0  |  1  |  1  |  1  | y-x |    | 000111 =    07   | rsub  |
-// | 17 |  0  |  0  |  0  |  0  |  0  |  0  | x&y |    | 000000 =    00   | and   |
-// | 18 |  0  |  1  |  0  |  1  |  0  |  1  | y|y |    | 010101 =    15   | or    |
-// |----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-------+
+// +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+
+// | ## | zx  | nx  | zy  | ny  |  f  | no  | out | => |  6-bit = opcodes | instruct. |
+// +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+
+// | 01 |  1  |  0  |  1  |  0  |  1  |  0  |  0  |    | 101010 =    2A   | Zero      |
+// | 02 |  1  |  1  |  1  |  1  |  1  |  1  |  1  |    | 111111 =    3F   | One       |
+// | 03 |  1  |  1  |  1  |  0  |  1  |  0  | -1  |    | 111010 =    3E   | MinusOne  |
+// | 04 |  0  |  0  |  1  |  1  |  0  |  0  |  x  |    | 001100 =    0C   | X         |
+// | 05 |  1  |  1  |  0  |  0  |  0  |  0  |  y  |    | 110000 =    30   | Y         |
+// | 06 |  0  |  0  |  1  |  1  |  0  |  1  | !x  |    | 001101 =    0D   | NegX      |
+// | 07 |  1  |  1  |  0  |  0  |  0  |  1  | !y  |    | 110001 =    31   | NegY      |
+// | 08 |  0  |  0  |  1  |  1  |  1  |  1  | -x  |    | 001111 =    0F   | MinusX    |
+// | 09 |  1  |  1  |  0  |  0  |  1  |  1  | -y  |    | 110011 =    33   | MinusY    |
+// | 10 |  0  |  1  |  1  |  1  |  1  |  1  | x+1 |    | 011111 =    1F   | XPlusOne  |
+// | 11 |  1  |  1  |  0  |  1  |  1  |  1  | y+1 |    | 110111 =    37   | YPlusOne  |
+// | 12 |  0  |  0  |  1  |  1  |  1  |  0  | x-1 |    | 001110 =    0E   | XMinusOne |
+// | 13 |  1  |  1  |  0  |  0  |  1  |  0  | y-1 |    | 110010 =    32   | YMinusOne |
+// | 14 |  0  |  0  |  0  |  0  |  1  |  0  | x+y |    | 000010 =    02   | XPlusY    |
+// | 15 |  0  |  1  |  0  |  0  |  1  |  1  | x-y |    | 010011 =    13   | XMinusY   |
+// | 16 |  0  |  0  |  0  |  1  |  1  |  1  | y-x |    | 000111 =    07   | YMinusX   |
+// | 17 |  0  |  0  |  0  |  0  |  0  |  0  | x&y |    | 000000 =    00   | XAndY     |
+// | 18 |  0  |  1  |  0  |  1  |  0  |  1  | y|y |    | 010101 =    15   | YOrY      |
+// |----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+
 
 fn print_bin(prefix: &str, output: [bool; 16]) {
     let res = convert::from_b16(output);
@@ -103,17 +103,18 @@ fn func(input_a: [bool; 16], input_b: [bool; 16], func: bool) -> [bool; 16] {
 }
 
 fn negate(input: [bool; 16]) -> [bool; 16] {
-    let not_res = not16(input);
-    let res = inc16(not_res);
+    not16(input)
+    // let not_res = not16(input);
+    // let res = inc16(not_res);
 
-    println!(
-        "negating the result {}: ",
-        convert::from_b16(input).unwrap()
-    );
-    println!(" - returning {}: ", convert::from_b16(res).unwrap());
-    print!("\n");
+    // println!(
+    //     "negating the result {}: ",
+    //     convert::from_b16(input).unwrap()
+    // );
+    // println!(" - returning {}: ", convert::from_b16(res).unwrap());
+    // print!("\n");
 
-    res
+    // res
 }
 
 fn is_negative(input: [bool; 16]) -> bool {
@@ -240,7 +241,7 @@ mod tests {
                 opcode: opcodes.get(&Opcode::Zero).cloned(),
                 expect_out: bin_str_to_b16(String::from("0000000000000000")),
                 expect_zr: true,
-                expect_ng: false, // alu returns negative here. is it ok?
+                expect_ng: false,
             },
             AluTestCase {
                 opcode: opcodes.get(&Opcode::One).cloned(),
@@ -266,15 +267,28 @@ mod tests {
                 expect_zr: false,
                 expect_ng: false,
             },
-            // NegX,
             AluTestCase {
                 opcode: opcodes.get(&Opcode::NegX).cloned(),
-                expect_out: convert::from_i16(5242).unwrap().as_array_b16, // -5242
+                // NOTE: This is feature by two's complement system.
+                expect_out: convert::from_i16(5241).unwrap().as_array_b16, // -5242
                 expect_zr: false,
-                expect_ng: false,
+                expect_ng: false, // TODO: is this correct?
             },
-            // NegY,
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::NegY).cloned(),
+                // NOTE: This is feature by two's complement system.
+                expect_out: convert::from_i16(-6254).unwrap().as_array_b16, // 6253
+                expect_zr: false,
+                expect_ng: true, // TODO: is this correct?
+            },
             // MinusX,
+            // AluTestCase {
+            //     opcode: opcodes.get(&Opcode::MinusX).cloned(),
+            //     // NOTE: This is feature by two's complement system.
+            //     expect_out: convert::from_i16(-5241).unwrap().as_array_b16, // -5242
+            //     expect_zr: false,
+            //     expect_ng: true,
+            // },
             // MinusY,
             // XPlusOne,
             // YPlusOne,

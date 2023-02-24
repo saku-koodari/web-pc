@@ -14,7 +14,12 @@ use std::{collections::HashMap, fmt};
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub enum Opcode {
     {{#each opcodes_enum}}
-    {{this}},
+
+    /// Opcode: {{field}}
+    ///  - Integer: {{int}}
+    ///  - Hex: {{hex}}
+    ///  - Binary: {{bin}}
+    {{field}},
     {{/each}}
 }
 

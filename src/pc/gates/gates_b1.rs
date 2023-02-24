@@ -15,7 +15,9 @@ pub fn or(a: bool, b: bool) -> bool {
 
 // XOR Gate
 pub fn xor(a: bool, b: bool) -> bool {
-    or(and(a, not(b)), and(not(a), b)) // a ^ b
+    or(
+        and(a, not(b)), 
+        and(not(a), b)) // a ^ b
 }
 
 // NAND Gate
@@ -30,7 +32,7 @@ pub fn nor(a: bool, b: bool) -> bool {
 
 // XNOR Gate
 pub fn xnor(a: bool, b: bool) -> bool {
-    not(a ^ b)
+    not(xor(a, b))
 }
 
 /// 1-bit Multiplexer. a.ka. data selector. if sel is true, return b, else return a
@@ -43,7 +45,9 @@ pub fn xnor(a: bool, b: bool) -> bool {
 /// ## Returns
 /// * `bool` - output
 pub fn mux(a: bool, b: bool, sel: bool) -> bool {
-    or(and(a, not(sel)), and(b, sel))
+    or(
+        and(a, not(sel)),
+         and(b, sel))
 }
 
 // Demultiplexer
