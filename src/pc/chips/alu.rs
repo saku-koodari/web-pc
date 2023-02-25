@@ -157,7 +157,10 @@ pub fn alu(
     println!("INPUT:");
     println!(" - x: {}", convert_16b::from_b16(x).unwrap().as_string_bin);
     println!(" - y: {}", convert_16b::from_b16(y).unwrap().as_string_bin);
-    println!(" - {}", crate::utils::convert::alu_opcode_from_bytes(zx, nx, zy, ny, f, no));
+    println!(
+        " - {}",
+        crate::utils::convert::alu_opcode_from_bytes(zx, nx, zy, ny, f, no)
+    );
     print!("\n");
     print!("\n");
 
@@ -293,7 +296,7 @@ mod tests {
                 opcode: opcodes.get(&Opcode::MinusX).cloned(),
                 expect_out: bin_str_to_b16(String::from("0001010001111010")), // FAILS
                 expect_zr: false,
-                expect_ng: true,
+                expect_ng: false,
             },
             AluTestCase {
                 opcode: opcodes.get(&Opcode::MinusY).cloned(),
