@@ -44,7 +44,7 @@ pub fn panel_adder(
 
         match result {
             Ok((a, b)) => {
-                let output_b16 = crate::pc::chips::adder::adder_b16(a, b);
+                let output_b16 = crate::hack_computer::chips::adder::adder_b16(a, b);
 
                 let output_i32 = utils::convert_16b::from_b16(output_b16);
                 data.output = output_i32.unwrap().to_string(); // TODO: Do we need to check the error?

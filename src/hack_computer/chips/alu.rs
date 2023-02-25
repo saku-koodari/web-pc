@@ -1,5 +1,5 @@
 use crate::{
-    pc::{
+    hack_computer::{
         chips::adder::adder_b16,
         gates::{
             gates_b1::{mux, not, or},
@@ -221,7 +221,7 @@ mod tests {
     // TODO: Make test cases for all opcodes, but using static x and y values (then out can be also static)
     #[test]
     fn test_alu_test_cases_1() {
-        use crate::pc::chips::alu::alu;
+        use crate::hack_computer::chips::alu::alu;
         use crate::utils::{
             convert_16b::from_b16,
             opcodes::{get_opcodes, AluControlBits, Opcode},

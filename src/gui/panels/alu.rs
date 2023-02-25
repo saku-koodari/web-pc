@@ -78,7 +78,7 @@ pub fn panel_alu(
 
         match result {
             Ok((a, b)) => {
-                let alu_res = crate::pc::chips::alu::alu(
+                let alu_res = crate::hack_computer::chips::alu::alu(
                     a,
                     b,
                     data.input_zx,

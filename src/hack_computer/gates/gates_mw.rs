@@ -5,8 +5,8 @@
 //   - DMux4Way
 //   - DMux8Way
 
-use crate::pc::gates::gates_b16::demux16;
-use crate::pc::gates::gates_b16::mux16;
+use crate::hack_computer::gates::gates_b16::demux16;
+use crate::hack_computer::gates::gates_b16::mux16;
 
 use super::gates_b1::or;
 
