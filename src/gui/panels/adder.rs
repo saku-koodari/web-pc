@@ -1,4 +1,4 @@
-use crate::utils::{self, convert::from_string_integer};
+use crate::utils::{self, convert_16b::from_string_integer};
 
 pub struct AdderData {
     // TODO: Is it possible to convert into i32?
@@ -24,9 +24,9 @@ pub fn panel_adder(
     ui: &mut egui::Ui,
     label: &mut String,
     data: &mut AdderData,
-    frame: &mut eframe::Frame,
+    _frame: &mut eframe::Frame,
 ) {
-    ui.label("16-bit Adder");
+    ui.label(label.clone());
     ui.horizontal(|ui| {
         ui.label("Input A:");
         ui.add(egui::widgets::TextEdit::singleline(&mut data.input_a));
@@ -46,7 +46,7 @@ pub fn panel_adder(
             Ok((a, b)) => {
                 let output_b16 = crate::pc::chips::adder::adder_b16(a, b);
 
-                let output_i32 = utils::convert::from_b16(output_b16);
+                let output_i32 = utils::convert_16b::from_b16(output_b16);
                 data.output = output_i32.unwrap().to_string(); // TODO: Do we need to check the error?
             }
             Err(e) => {

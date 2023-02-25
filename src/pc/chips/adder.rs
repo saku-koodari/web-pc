@@ -38,24 +38,31 @@ pub fn adder_b16(a: [bool; 16], b: [bool; 16]) -> [bool; 16] {
 }
 
 pub fn inc16(input: [bool; 16]) -> [bool; 16] {
-    // TODO: This might need optimization,
-    // because the adder_b16 is called here.
-    let sum = adder_b16(
-        input,
-        // This value (1-6 bit +1) exists on utils-module as const B16_1, but it's not used here.
-        // This is because the utils-module is not allowed to use in the pc-module,
-        // Since the PC should handle only binary values and be independent from other modules.
-        // unit tests are only exception, in order to provided easines for testing.
-        [
-            true, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false,
-        ],
-    );
-    sum
+    let (sum00, c01) = half_adder(input[0], true);
+    let (sum01, c02) = half_adder(input[1], c01);
+    let (sum02, c03) = half_adder(input[2], c02);
+    let (sum03, c04) = half_adder(input[3], c03);
+    let (sum04, c05) = half_adder(input[4], c04);
+    let (sum05, c06) = half_adder(input[5], c05);
+    let (sum06, c07) = half_adder(input[6], c06);
+    let (sum07, c08) = half_adder(input[7], c07);
+    let (sum08, c09) = half_adder(input[8], c08);
+    let (sum09, c10) = half_adder(input[9], c09);
+    let (sum10, c11) = half_adder(input[10], c10);
+    let (sum11, c12) = half_adder(input[11], c11);
+    let (sum12, c13) = half_adder(input[12], c12);
+    let (sum13, c14) = half_adder(input[13], c13);
+    let (sum14, c15) = half_adder(input[14], c14);
+    let (sum15, _) = half_adder(input[15], c15);
+
+    [
+        sum00, sum01, sum02, sum03, sum04, sum05, sum06, sum07, sum08, sum09, sum10, sum11, sum12,
+        sum13, sum14, sum15,
+    ]
 }
 
 mod tests {
-    use crate::utils::convert::ConvertResult;
+    use crate::utils::convert_16b::ConvertResult;
 
     #[test]
     fn test_half_adder() {
@@ -81,10 +88,10 @@ mod tests {
     }
 
     #[test]
-    fn test_adder_rca_b16() {
+    fn test_adder_b16() {
         use crate::{
             pc::chips::adder::adder_b16,
-            utils::convert::{from_b16, from_i16},
+            utils::convert_16b::{from_b16, from_i16},
         };
 
         struct TestCase {
@@ -147,6 +154,69 @@ mod tests {
 
             // debug
             print!("Test passed.\n");
+        }
+    }
+
+    #[test]
+    fn test_inc16() {
+        use crate::{
+            pc::chips::adder::inc16,
+            utils::convert_16b::{from_b16, from_i16},
+        };
+
+        struct TestCase {
+            input: Result<ConvertResult, String>,
+            output: Result<ConvertResult, String>,
+            name: String,
+        }
+
+        // arrange
+        let test_cases = vec![
+            TestCase {
+                input: from_i16(0),
+                output: from_i16(1),
+                name: String::from("test 1: 0 + 1 = 1"),
+            },
+            TestCase {
+                input: from_i16(1),
+                output: from_i16(2),
+                name: String::from("test 2: 1 + 1 = 2"),
+            },
+            TestCase {
+                input: from_i16(5),
+                output: from_i16(6),
+                name: String::from("test 4: 5 + 1 = 6"),
+            },
+            TestCase {
+                input: from_i16(-1),
+                output: from_i16(0),
+                name: String::from("test 5: -1 + 1 = 0"),
+            },
+            TestCase {
+                input: from_i16(-5),
+                output: from_i16(-4),
+                name: String::from("test 6: -5 + 1 = -4"),
+            },
+        ];
+
+        for case in test_cases {
+            print!("\ntesting {n}...\n", n = case.name);
+
+            let input = case.input.unwrap();
+
+            println!("input: {input}");
+
+            // act
+            let res = inc16(input.as_array_b16);
+
+            let expected = case.output.unwrap().as_integer;
+            let actual = from_b16(res).unwrap().as_integer;
+
+            assert_eq!(expected, actual);
+
+            // debug
+            // print!(
+            //     "expected: {output}. actual: {res}.\n",
         }
     }
 

@@ -71,22 +71,6 @@ impl eframe::App for GuiApp {
             not_data,
         } = self;
 
-        // Examples of how to create different panels and windows.
-        // Pick whichever suits you.
-        // Tip: a good default choice is to just keep the `CentralPanel`.
-        // For inspiration and more examples, go to https://emilk.github.io/egui
-        #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
-            egui::menu::bar(ui, |ui| {
-                ui.menu_button("File", |ui| {
-                    if ui.button("Quit").clicked() {
-                        _frame.close();
-                    }
-                });
-            });
-        });
-
         #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
@@ -102,7 +86,7 @@ impl eframe::App for GuiApp {
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.heading("Tools");
 
-            //panel_alu(/*ctx,*/ ui, label, alu_data, _frame);
+            // panel_alu(/*ctx,*/ ui, label, alu_data, _frame);
             // ui.separator();
 
             panel_adder(/*ctx,*/ ui, label, adder_data, _frame);

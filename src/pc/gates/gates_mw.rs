@@ -17,6 +17,44 @@ pub fn or8way(a: [bool; 8]) -> bool {
     )
 }
 
+pub fn or16way(a: [bool; 16]) -> bool {
+    // It's a bit ugly, but this you need to do, if you can't use if statement
+    or(
+        a[0],
+        or(
+            a[1],
+            or(
+                a[2],
+                or(
+                    a[3],
+                    or(
+                        a[4],
+                        or(
+                            a[5],
+                            or(
+                                a[6],
+                                or(
+                                    a[7],
+                                    or(
+                                        a[8],
+                                        or(
+                                            a[9],
+                                            or(
+                                                a[10],
+                                                or(a[11], or(a[12], or(a[13], or(a[14], a[15])))),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+}
+
 pub fn mux4way16(
     a: [bool; 16],
     b: [bool; 16],

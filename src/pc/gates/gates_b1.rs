@@ -30,7 +30,7 @@ pub fn nor(a: bool, b: bool) -> bool {
 
 // XNOR Gate
 pub fn xnor(a: bool, b: bool) -> bool {
-    not(a ^ b)
+    not(xor(a, b))
 }
 
 /// 1-bit Multiplexer. a.ka. data selector. if sel is true, return b, else return a
