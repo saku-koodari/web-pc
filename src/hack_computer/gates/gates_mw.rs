@@ -8,6 +8,7 @@
 use crate::hack_computer::gates::gates_b16::demux16;
 use crate::hack_computer::gates::gates_b16::mux16;
 
+use super::gates_b1::demux;
 use super::gates_b1::or;
 
 pub fn or8way(a: [bool; 8]) -> bool {
@@ -17,6 +18,7 @@ pub fn or8way(a: [bool; 8]) -> bool {
     )
 }
 
+// Note: Extra gate comparing to original hack-computer
 pub fn or16way(a: [bool; 16]) -> bool {
     // It's a bit ugly, but this you need to do, if you can't use if statement
     or(
@@ -62,7 +64,15 @@ pub fn mux4way16(
     d: [bool; 16],
     s: [bool; 2],
 ) -> [bool; 16] {
-    mux16(mux16(a, b, s[0]), mux16(c, d, s[0]), s[1])
+    // s: 0 0 -> a
+    // s: 0 1 -> b
+    // s: 1 0 -> c
+    // s: 1 1 -> d
+
+    mux16(
+        mux16(a, b, s[0]), 
+        mux16(c, d, s[0]), 
+        s[1])
 }
 
 pub fn mux8way16(
@@ -83,38 +93,37 @@ pub fn mux8way16(
     )
 }
 
+// NOTE: correct signature
 pub fn demux4way(
-    input: [bool; 16],
+    input: bool,
     s: [bool; 2],
-) -> ([bool; 16], [bool; 16], [bool; 16], [bool; 16]) {
-    let (ab, cd) = demux16(input, s[1]);
-    let (a, b) = demux16(ab, s[0]);
-    let (c, d) = demux16(cd, s[0]);
+) -> (bool, bool, bool, bool) {
+    // s: 0 0 -> {in,0,0,0}
+    // s: 0 1 -> {0,in,0,0}
+    // s: 1 0 -> {0,0,in,0}
+    // s: 1 1 -> {0,0,0,in}
+
+    let (ab, cd) = demux(input, s[1]);
+    let (a, b) = demux(ab, s[0]);
+    let (c, d) = demux(cd, s[0]);
 
     (a, b, c, d)
 }
 
-pub fn dmux8way(
-    input: [bool; 16],
-    s: [bool; 3],
-) -> (
-    [bool; 16],
-    [bool; 16],
-    [bool; 16],
-    [bool; 16],
-    [bool; 16],
-    [bool; 16],
-    [bool; 16],
-    [bool; 16],
-) {
-    let (abcd, efgh) = demux16(input, s[2]);
-    let (ab, cd) = demux16(abcd, s[1]);
-    let (ef, gh) = demux16(efgh, s[1]);
 
-    let (a, b) = demux16(ab, s[0]);
-    let (c, d) = demux16(cd, s[0]);
-    let (e, f) = demux16(ef, s[0]);
-    let (g, h) = demux16(gh, s[0]);
+// NOTE: correct signature
+pub fn dmux8way(
+    input: bool,
+    s: [bool; 3],
+) -> (bool, bool, bool, bool, bool, bool, bool, bool) {
+    let (abcd, efgh) = demux(input, s[2]);
+    let (ab, cd) = demux(abcd, s[1]);
+    let (ef, gh) = demux(efgh, s[1]);
+
+    let (a, b) = demux(ab, s[0]);
+    let (c, d) = demux(cd, s[0]);
+    let (e, f) = demux(ef, s[0]);
+    let (g, h) = demux(gh, s[0]);
 
     (a, b, c, d, e, f, g, h)
 }

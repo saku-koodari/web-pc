@@ -1,3 +1,5 @@
+use crate::hack_computer::{gates::gates_b1::mux, chips::flipflop::dff_unsafe};
+
 pub fn register_1bit_unsafe(input: bool, load: bool) -> bool {
     // Visual reprensentation of 1-BIT register
     //            load

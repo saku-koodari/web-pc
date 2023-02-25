@@ -1,3 +1,5 @@
+use crate::hack_computer::gates::gates_b1::{and, not, nor};
+
 
 /// Data flip flop. Uses unsafe code to store the NOR_OUT1 and NOR_OUT2 values.
 /// 
