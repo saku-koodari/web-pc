@@ -7,7 +7,7 @@ use crate::{
             gates_mw::{or16way, or8way},
         },
     },
-    utils::convert_16b,
+    utils::{convert_16b, opcodes::AluControlBits},
 };
 
 use super::adder::inc16;
@@ -157,7 +157,7 @@ pub fn alu(
     println!("INPUT:");
     println!(" - x: {}", convert_16b::from_b16(x).unwrap().as_string_bin);
     println!(" - y: {}", convert_16b::from_b16(y).unwrap().as_string_bin);
-    println!(" - control bits: zx:{zx}, nx:{nx}, zy:{zy}, ny:{ny}, f:{f}, no:{no}");
+    println!(" - {}", crate::utils::convert::alu_opcode_from_bytes(zx, nx, zy, ny, f, no));
     print!("\n");
     print!("\n");
 
