@@ -1,4 +1,4 @@
-use crate::utils::{self, convert::from_string_integer};
+use crate::utils::{self, convert_16b::from_string_integer};
 
 pub struct AluData {
     // TODO: Is it possible to convert into i16?
@@ -74,7 +74,7 @@ pub fn panel_alu(
 
     ui.horizontal(|ui| ui.label("Result:"));
 
-    let label_result = utils::convert::from_string_integer(data.output_out.clone());
+    let label_result = utils::convert_16b::from_string_integer(data.output_out.clone());
     match label_result {
         Ok(a) => {
             ui.horizontal(|ui| {

@@ -62,7 +62,7 @@ pub fn inc16(input: [bool; 16]) -> [bool; 16] {
 }
 
 mod tests {
-    use crate::utils::convert::ConvertResult;
+    use crate::utils::convert_16b::ConvertResult;
 
     #[test]
     fn test_half_adder() {
@@ -91,7 +91,7 @@ mod tests {
     fn test_adder_b16() {
         use crate::{
             pc::chips::adder::adder_b16,
-            utils::convert::{from_b16, from_i16},
+            utils::convert_16b::{from_b16, from_i16},
         };
 
         struct TestCase {
@@ -161,7 +161,7 @@ mod tests {
     fn test_inc16() {
         use crate::{
             pc::chips::adder::inc16,
-            utils::convert::{from_b16, from_i16},
+            utils::convert_16b::{from_b16, from_i16},
         };
 
         struct TestCase {

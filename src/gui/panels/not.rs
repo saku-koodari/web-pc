@@ -1,6 +1,6 @@
 use egui::Context;
 
-use crate::utils::{self, convert::from_string_integer};
+use crate::utils::{self, convert_16b::from_string_integer};
 
 pub struct NotData {
     input: String,
@@ -30,7 +30,7 @@ pub fn panel_not(
         ui.label("Input:");
         ui.add(egui::widgets::TextEdit::singleline(&mut data.input));
 
-        let label_result = utils::convert::from_string_integer(data.input.clone());
+        let label_result = utils::convert_16b::from_string_integer(data.input.clone());
         match label_result {
             Ok(a) => {
                 ui.label(a.to_string());
@@ -47,7 +47,7 @@ pub fn panel_not(
             Ok(a) => {
                 let output_b16 = crate::pc::gates::gates_b16::not16(a.as_array_b16);
 
-                let output = utils::convert::from_b16(output_b16);
+                let output = utils::convert_16b::from_b16(output_b16);
                 data.output = output.unwrap().to_string(); // TODO: Do we need to check the error?
             }
             Err(e) => {

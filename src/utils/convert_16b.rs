@@ -106,7 +106,7 @@ mod tests {
                 B16_0, B16_MINUS_1, B16_MINUS_2, B16_MINUS_21846, B16_MINUS_32768, B16_PLUS_1,
                 B16_PLUS_2, B16_PLUS_21845, B16_PLUS_32767,
             },
-            convert::from_b16,
+            convert_16b::from_b16,
         };
         assert_eq!(from_b16(B16_0).unwrap().as_integer, 0);
         assert_eq!(from_b16(B16_PLUS_1).unwrap().as_integer, 1);
@@ -126,7 +126,7 @@ mod tests {
                 B16_0, B16_MINUS_1, B16_MINUS_2, B16_MINUS_21846, B16_MINUS_32768, B16_PLUS_1,
                 B16_PLUS_2, B16_PLUS_21845, B16_PLUS_32767,
             },
-            convert::from_i16,
+            convert_16b::from_i16,
         };
 
         // The test needs to be against the binary constants
@@ -149,7 +149,7 @@ mod tests {
                 B16_0, B16_MINUS_1, B16_MINUS_2, B16_MINUS_21846, B16_MINUS_32768, B16_PLUS_1,
                 B16_PLUS_2, B16_PLUS_21845, B16_PLUS_32767,
             },
-            convert::from_string_integer,
+            convert_16b::from_string_integer,
         };
 
         // Arrange

@@ -7,7 +7,7 @@ use crate::{
             gates_mw::{or16way, or8way},
         },
     },
-    utils::convert,
+    utils::convert_16b,
 };
 
 use super::adder::inc16;
@@ -42,7 +42,7 @@ use super::adder::inc16;
 // |----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+------------------+-- +---+
 
 fn print_bin(prefix: &str, output: [bool; 16]) {
-    let res = convert::from_b16(output);
+    let res = convert_16b::from_b16(output);
     match res {
         Ok(res) => println!("{}{}", prefix, res),
         Err(e) => println!("CANNOT PRINT BOOL: {}", e),
@@ -55,13 +55,13 @@ fn zero_negator(input: [bool; 16], zero: bool, negate: bool) -> [bool; 16] {
     let res = mux16(z_res, not16(z_res), negate);
 
     // debug
-    let c_res = convert::from_b16(input).unwrap().as_string_bin;
+    let c_res = convert_16b::from_b16(input).unwrap().as_string_bin;
     println!(" - zero_negator(input: {c_res}, zero:{zero}, negate:{negate})");
 
-    let c_z_res = convert::from_b16(z_res).unwrap().as_string_bin;
+    let c_z_res = convert_16b::from_b16(z_res).unwrap().as_string_bin;
     println!(" - zeroing result: {c_z_res}");
 
-    let c_n_res = convert::from_b16(res).unwrap();
+    let c_n_res = convert_16b::from_b16(res).unwrap();
     println!(" - - negationing result: {}", c_n_res.as_string_bin);
     println!(
         "returning: [int:{}, hex:{}, bin:{}]",
@@ -79,23 +79,23 @@ fn func(input_a: [bool; 16], input_b: [bool; 16], func: bool) -> [bool; 16] {
     let res = mux16(and_res, adder_res, func);
 
     // debug
-    let c_input_a = convert::from_b16(input_a).unwrap();
-    let c_input_b = convert::from_b16(input_b).unwrap();
+    let c_input_a = convert_16b::from_b16(input_a).unwrap();
+    let c_input_b = convert_16b::from_b16(input_b).unwrap();
     println!(
         "func(input_a: {}, input_b: {}, func: {})",
         c_input_a.as_string_bin, c_input_b.as_string_bin, func
     );
     println!(
         " - And result: {}",
-        convert::from_b16(and_res).unwrap().as_string_bin
+        convert_16b::from_b16(and_res).unwrap().as_string_bin
     );
     println!(
         " - Adder result: {}",
-        convert::from_b16(adder_res).unwrap().as_string_bin
+        convert_16b::from_b16(adder_res).unwrap().as_string_bin
     );
     println!(
         " - returning: {}",
-        convert::from_b16(res).unwrap().as_string_bin
+        convert_16b::from_b16(res).unwrap().as_string_bin
     );
     print!("\n");
 
@@ -155,8 +155,8 @@ pub fn alu(
     print!("\n");
 
     println!("INPUT:");
-    println!(" - x: {}", convert::from_b16(x).unwrap().as_string_bin);
-    println!(" - y: {}", convert::from_b16(y).unwrap().as_string_bin);
+    println!(" - x: {}", convert_16b::from_b16(x).unwrap().as_string_bin);
+    println!(" - y: {}", convert_16b::from_b16(y).unwrap().as_string_bin);
     println!(" - control bits: zx:{zx}, nx:{nx}, zy:{zy}, ny:{ny}, f:{f}, no:{no}");
     print!("\n");
     print!("\n");
@@ -180,7 +180,10 @@ pub fn alu(
     print!("\n");
     print!("\n");
     println!("ALU RETURNS:");
-    println!(" - out: {}", convert::from_b16(out).unwrap().as_string_bin);
+    println!(
+        " - out: {}",
+        convert_16b::from_b16(out).unwrap().as_string_bin
+    );
     println!(" - zr: {zr}");
     println!(" - ng: {ng}");
 
@@ -199,7 +202,7 @@ pub fn alu(
 }
 
 mod tests {
-    use crate::utils::convert::{self, from_i16, from_string_binary};
+    use crate::utils::convert_16b::{self, from_i16, from_string_binary};
 
     // unit tests for ALU (arithmatic logic unit)
     fn i16_to_b16(i: i16) -> [bool; 16] {
@@ -217,7 +220,7 @@ mod tests {
     fn test_alu_test_cases_1() {
         use crate::pc::chips::alu::alu;
         use crate::utils::{
-            convert::from_b16,
+            convert_16b::from_b16,
             opcodes::{get_opcodes, AluControlBits, Opcode},
         };
 
@@ -230,8 +233,15 @@ mod tests {
             expect_ng: bool, // negative result
         }
 
-        let input_x = bin_str_to_b16(String::from("1110101110000110")); // -5242
-        let input_y = bin_str_to_b16(String::from("0001100001101101")); // 6253
+        /// 1110101110000110 = -5242
+        fn get_input_x() -> [bool; 16] {
+            bin_str_to_b16(String::from("1110101110000110"))
+        }
+
+        /// 0001100001101101 = 6253
+        fn get_input_y() -> [bool; 16] {
+            bin_str_to_b16(String::from("0001100001101101"))
+        }
 
         let opcodes = get_opcodes();
 
@@ -257,13 +267,13 @@ mod tests {
             },
             AluTestCase {
                 opcode: opcodes.get(&Opcode::X).cloned(),
-                expect_out: input_x, // -5242
+                expect_out: get_input_x(), // -5242
                 expect_zr: false,
                 expect_ng: true,
             },
             AluTestCase {
                 opcode: opcodes.get(&Opcode::Y).cloned(),
-                expect_out: input_y, // 6253
+                expect_out: get_input_y(), // 6253
                 expect_zr: false,
                 expect_ng: false,
             },
@@ -291,14 +301,12 @@ mod tests {
                 expect_zr: false,
                 expect_ng: true,
             },
-
             AluTestCase {
                 opcode: opcodes.get(&Opcode::XPlusOne).cloned(),
                 expect_out: bin_str_to_b16(String::from("1110101110000111")), // NOT TESTED
                 expect_zr: false,
                 expect_ng: true,
             },
-
             // YPlusOne,    // out[16]	0001100001101110 zr	0 ng	0
             AluTestCase {
                 opcode: opcodes.get(&Opcode::YPlusOne).cloned(),
@@ -306,7 +314,6 @@ mod tests {
                 expect_zr: false,
                 expect_ng: false,
             },
-
             // XMinusOne,   // out[16]	1110101110000101 zr	0 ng	1
             AluTestCase {
                 opcode: opcodes.get(&Opcode::XMinusOne).cloned(),
@@ -314,7 +321,6 @@ mod tests {
                 expect_zr: false,
                 expect_ng: true,
             },
-
             // YMinusOne,   // out[16]	0001100001101100 zr	0 ng	0
             AluTestCase {
                 opcode: opcodes.get(&Opcode::YMinusOne).cloned(),
@@ -322,7 +328,6 @@ mod tests {
                 expect_zr: false,
                 expect_ng: false,
             },
-
             // XPlusY,      // out[16]	0000001111110011 zr	0 ng	0
             AluTestCase {
                 opcode: opcodes.get(&Opcode::XPlusY).cloned(),
@@ -330,7 +335,6 @@ mod tests {
                 expect_zr: false,
                 expect_ng: false,
             },
-
             // XMinusY,     // out[16]	1101001100011001 zr	0 ng	1
             AluTestCase {
                 opcode: opcodes.get(&Opcode::XMinusY).cloned(),
@@ -338,7 +342,6 @@ mod tests {
                 expect_zr: false,
                 expect_ng: true,
             },
-
             // YMinusX,     // out[16]	0010110011100111 zr	0 ng	0
             AluTestCase {
                 opcode: opcodes.get(&Opcode::YMinusX).cloned(),
@@ -346,7 +349,6 @@ mod tests {
                 expect_zr: false,
                 expect_ng: false,
             },
-
             // XAndY,       // out[16]	0000100000000100 zr	0 ng	0
             AluTestCase {
                 opcode: opcodes.get(&Opcode::XAndY).cloned(),
@@ -354,7 +356,6 @@ mod tests {
                 expect_zr: false,
                 expect_ng: false,
             },
-
             // YOrY,        // out[16]	1111101111101111 zr	0 ng	1
             AluTestCase {
                 opcode: opcodes.get(&Opcode::YOrY).cloned(),
@@ -370,8 +371,8 @@ mod tests {
             println!("TESTING: '{}'", alu_control_bits.name);
 
             let actual_result = alu(
-                input_x,
-                input_y,
+                get_input_x(),
+                get_input_y(),
                 alu_control_bits.zx,
                 alu_control_bits.nx,
                 alu_control_bits.zy,
@@ -387,26 +388,24 @@ mod tests {
             println!("debugging after act...");
             println!("control bits: {:?}", alu_control_bits);
             println!(
-                "expected out: {}, {:?}",
-                expected_out.as_integer, expected_out.as_string_bin
+                "expected   out: {}, {:?}, zr: {},  ng: {}",
+                expected_out.as_integer,
+                expected_out.as_string_bin,
+                test_case.expect_zr,
+                test_case.expect_ng
             );
             println!(
-                "actual out: {}, {:?}",
-                actual_out.as_integer, actual_out.as_string_bin
+                "actual     out: {}, {:?}, zr: {},  ng: {}",
+                actual_out.as_integer, actual_out.as_string_bin, actual_result.1, actual_result.2
             );
 
             print!("\n");
             println!("asserting...");
             assert_eq!(actual_out.as_integer, expected_out.as_integer);
-            assert_eq!(
-                actual_result.1, test_case.expect_zr,
-                "\n ----- ZERO RESULT - expected: {}, actual: {}\n\n",
-                test_case.expect_zr, actual_result.1
-            );
+            assert_eq!(actual_result.1, test_case.expect_zr, "WRONG ZERO RESULT");
             assert_eq!(
                 actual_result.2, test_case.expect_ng,
-                "\n ----- NEGATIVE RESULT - expected: {}, actual: {}\n\n",
-                test_case.expect_ng, actual_result.2
+                "WRONG NEGATIVE RESULT"
             );
         }
     }
