@@ -19,27 +19,27 @@ use super::adder::inc16;
 // +----+-----------------------------------+-----+
 // |    | preset-x  | preset-y  | sel |post | out |
 // +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+
-// | ## | zx  | nx  | zy  | ny  |  f  | no  | out | => |  6-bit = opcodes | instruct. |
-// +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+
-// | 01 |  1  |  0  |  1  |  0  |  1  |  0  |  0  |    | 101010 =    2A   | Zero      |
-// | 02 |  1  |  1  |  1  |  1  |  1  |  1  |  1  |    | 111111 =    3F   | One       |
-// | 03 |  1  |  1  |  1  |  0  |  1  |  0  | -1  |    | 111010 =    3E   | MinusOne  |
-// | 04 |  0  |  0  |  1  |  1  |  0  |  0  |  x  |    | 001100 =    0C   | X         |
-// | 05 |  1  |  1  |  0  |  0  |  0  |  0  |  y  |    | 110000 =    30   | Y         |
-// | 06 |  0  |  0  |  1  |  1  |  0  |  1  | !x  |    | 001101 =    0D   | NegX      |
-// | 07 |  1  |  1  |  0  |  0  |  0  |  1  | !y  |    | 110001 =    31   | NegY      |
-// | 08 |  0  |  0  |  1  |  1  |  1  |  1  | -x  |    | 001111 =    0F   | MinusX    |
-// | 09 |  1  |  1  |  0  |  0  |  1  |  1  | -y  |    | 110011 =    33   | MinusY    |
-// | 10 |  0  |  1  |  1  |  1  |  1  |  1  | x+1 |    | 011111 =    1F   | XPlusOne  |
-// | 11 |  1  |  1  |  0  |  1  |  1  |  1  | y+1 |    | 110111 =    37   | YPlusOne  |
-// | 12 |  0  |  0  |  1  |  1  |  1  |  0  | x-1 |    | 001110 =    0E   | XMinusOne |
-// | 13 |  1  |  1  |  0  |  0  |  1  |  0  | y-1 |    | 110010 =    32   | YMinusOne |
-// | 14 |  0  |  0  |  0  |  0  |  1  |  0  | x+y |    | 000010 =    02   | XPlusY    |
-// | 15 |  0  |  1  |  0  |  0  |  1  |  1  | x-y |    | 010011 =    13   | XMinusY   |
-// | 16 |  0  |  0  |  0  |  1  |  1  |  1  | y-x |    | 000111 =    07   | YMinusX   |
-// | 17 |  0  |  0  |  0  |  0  |  0  |  0  | x&y |    | 000000 =    00   | XAndY     |
-// | 18 |  0  |  1  |  0  |  1  |  0  |  1  | y|y |    | 010101 =    15   | YOrY      |
-// |----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+
+// | ## | zx  | nx  | zy  | ny  |  f  | no  | out | => |  6-bit = opcodes | instruct. | test-output
+// +----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+------------------+-- +---+
+// | 01 |  1  |  0  |  1  |  0  |  1  |  0  |  0  |    | 101010 =    2A   | Zero      | out[16] 0000000000000000 zr 1 ng    0
+// | 02 |  1  |  1  |  1  |  1  |  1  |  1  |  1  |    | 111111 =    3F   | One       | out[16] 0000000000000001 zr 0 ng    0
+// | 03 |  1  |  1  |  1  |  0  |  1  |  0  | -1  |    | 111010 =    3E   | MinusOne  | out[16]	1111111111111111 zr	0 ng	1
+// | 04 |  0  |  0  |  1  |  1  |  0  |  0  |  x  |    | 001100 =    0C   | X         | out[16]	1110101110000110 zr	0 ng	1
+// | 05 |  1  |  1  |  0  |  0  |  0  |  0  |  y  |    | 110000 =    30   | Y         | out[16]	0001100001101101 zr 0 ng	0
+// | 06 |  0  |  0  |  1  |  1  |  0  |  1  | !x  |    | 001101 =    0D   | NegX      | out[16]	0001010001111001 zr	0 ng	0
+// | 07 |  1  |  1  |  0  |  0  |  0  |  1  | !y  |    | 110001 =    31   | NegY      | out[16]	1110011110010010 zr	0 ng	1
+// | 08 |  0  |  0  |  1  |  1  |  1  |  1  | -x  |    | 001111 =    0F   | MinusX    | out[16]	0001010001111010 zr	0 ng	0
+// | 09 |  1  |  1  |  0  |  0  |  1  |  1  | -y  |    | 110011 =    33   | MinusY    | out[16]	1110011110010011 zr	0 ng	1
+// | 10 |  0  |  1  |  1  |  1  |  1  |  1  | x+1 |    | 011111 =    1F   | XPlusOne  | out[16]	1110101110000111 zr	0 ng	1
+// | 11 |  1  |  1  |  0  |  1  |  1  |  1  | y+1 |    | 110111 =    37   | YPlusOne  | out[16]	0001100001101110 zr	0 ng	0
+// | 12 |  0  |  0  |  1  |  1  |  1  |  0  | x-1 |    | 001110 =    0E   | XMinusOne | out[16]	1110101110000101 zr	0 ng	1
+// | 13 |  1  |  1  |  0  |  0  |  1  |  0  | y-1 |    | 110010 =    32   | YMinusOne | out[16]	0001100001101100 zr	0 ng	0
+// | 14 |  0  |  0  |  0  |  0  |  1  |  0  | x+y |    | 000010 =    02   | XPlusY    | out[16]	0000001111110011 zr	0 ng	0
+// | 15 |  0  |  1  |  0  |  0  |  1  |  1  | x-y |    | 010011 =    13   | XMinusY   | out[16]	1101001100011001 zr	0 ng	1
+// | 16 |  0  |  0  |  0  |  1  |  1  |  1  | y-x |    | 000111 =    07   | YMinusX   | out[16]	0010110011100111 zr	0 ng	0
+// | 17 |  0  |  0  |  0  |  0  |  0  |  0  | x&y |    | 000000 =    00   | XAndY     | out[16]	0000100000000100 zr	0 ng	0
+// | 18 |  0  |  1  |  0  |  1  |  0  |  1  | y|y |    | 010101 =    15   | YOrY      | out[16]	1111101111101111 zr	0 ng	1
+// |----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+------------------+-- +---+
 
 fn print_bin(prefix: &str, output: [bool; 16]) {
     let res = convert::from_b16(output);
@@ -269,36 +269,99 @@ mod tests {
             },
             AluTestCase {
                 opcode: opcodes.get(&Opcode::NegX).cloned(),
-                // NOTE: This is feature by two's complement system.
-                expect_out: convert::from_i16(5241).unwrap().as_array_b16, // -5242
+                expect_out: bin_str_to_b16(String::from("0001010001111001")),
                 expect_zr: false,
-                expect_ng: false, // TODO: is this correct?
+                expect_ng: false,
             },
             AluTestCase {
                 opcode: opcodes.get(&Opcode::NegY).cloned(),
-                // NOTE: This is feature by two's complement system.
-                expect_out: convert::from_i16(-6254).unwrap().as_array_b16, // 6253
+                expect_out: bin_str_to_b16(String::from("1110011110010010")),
                 expect_zr: false,
-                expect_ng: true, // TODO: is this correct?
+                expect_ng: true,
             },
-            // MinusX,
-            // AluTestCase {
-            //     opcode: opcodes.get(&Opcode::MinusX).cloned(),
-            //     // NOTE: This is feature by two's complement system.
-            //     expect_out: convert::from_i16(-5241).unwrap().as_array_b16, // -5242
-            //     expect_zr: false,
-            //     expect_ng: true,
-            // },
-            // MinusY,
-            // XPlusOne,
-            // YPlusOne,
-            // XMinusOne,
-            // YMinusOne,
-            // XPlusY,
-            // XMinusY,
-            // YMinusX,
-            // XAndY,
-            // YOrY,
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::MinusX).cloned(),
+                expect_out: bin_str_to_b16(String::from("0001010001111010")), // FAILS
+                expect_zr: false,
+                expect_ng: true,
+            },
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::MinusY).cloned(),
+                expect_out: bin_str_to_b16(String::from("1110011110010011")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: true,
+            },
+
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::XPlusOne).cloned(),
+                expect_out: bin_str_to_b16(String::from("1110101110000111")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: true,
+            },
+
+            // YPlusOne,    // out[16]	0001100001101110 zr	0 ng	0
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::YPlusOne).cloned(),
+                expect_out: bin_str_to_b16(String::from("0001100001101110")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: false,
+            },
+
+            // XMinusOne,   // out[16]	1110101110000101 zr	0 ng	1
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::XMinusOne).cloned(),
+                expect_out: bin_str_to_b16(String::from("1110101110000101")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: true,
+            },
+
+            // YMinusOne,   // out[16]	0001100001101100 zr	0 ng	0
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::YMinusOne).cloned(),
+                expect_out: bin_str_to_b16(String::from("0001100001101100")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: false,
+            },
+
+            // XPlusY,      // out[16]	0000001111110011 zr	0 ng	0
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::XPlusY).cloned(),
+                expect_out: bin_str_to_b16(String::from("0000001111110011")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: false,
+            },
+
+            // XMinusY,     // out[16]	1101001100011001 zr	0 ng	1
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::XMinusY).cloned(),
+                expect_out: bin_str_to_b16(String::from("1101001100011001")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: true,
+            },
+
+            // YMinusX,     // out[16]	0010110011100111 zr	0 ng	0
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::YMinusX).cloned(),
+                expect_out: bin_str_to_b16(String::from("0010110011100111")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: false,
+            },
+
+            // XAndY,       // out[16]	0000100000000100 zr	0 ng	0
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::XAndY).cloned(),
+                expect_out: bin_str_to_b16(String::from("0000100000000100")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: false,
+            },
+
+            // YOrY,        // out[16]	1111101111101111 zr	0 ng	1
+            AluTestCase {
+                opcode: opcodes.get(&Opcode::YOrY).cloned(),
+                expect_out: bin_str_to_b16(String::from("1111101111101111")), // NOT TESTED
+                expect_zr: false,
+                expect_ng: true,
+            },
         ];
 
         // loop test cases
