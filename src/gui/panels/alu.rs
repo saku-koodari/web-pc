@@ -70,7 +70,37 @@ pub fn panel_alu(
     ui.horizontal(|ui| ui.checkbox(&mut data.input_f, "f"));
     ui.horizontal(|ui| ui.checkbox(&mut data.input_no, "no"));
 
-    if ui.button("Run").clicked() {}
+    if ui.button("Run").clicked() {
+        println!("CLICK");
+        let result = from_string_integer(data.input_x.clone())
+            .and_then(|a| {
+            from_string_integer(data.input_y.clone()).map(|b| (a.as_array_b16, b.as_array_b16))
+        });
+
+        match result {
+            Ok((a, b)) => {
+                let alu_res = crate::pc::chips::alu::alu(
+                    a,
+                    b,
+                    data.input_zx,
+                    data.input_nx,
+                    data.input_zy,
+                    data.input_ny,
+                    data.input_f,
+                    data.input_no,
+                );
+
+                let output_i32 = utils::convert_16b::from_b16(alu_res.0);
+                data.output_out = output_i32.unwrap().to_string(); // TODO: Do we need to check the error?
+                data.output_zr = alu_res.1;
+                data.output_ng = alu_res.2;
+            }
+            Err(e) => {
+                data.error = e;
+                return;
+            }
+        }
+    }
 
     ui.horizontal(|ui| ui.label("Result:"));
 

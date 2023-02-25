@@ -86,8 +86,8 @@ impl eframe::App for GuiApp {
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.heading("Tools");
 
-            panel_alu(/*ctx,*/ ui, label, alu_data, _frame);
-            ui.separator();
+            // panel_alu(/*ctx,*/ ui, label, alu_data, _frame);
+            // ui.separator();
 
             panel_adder(/*ctx,*/ ui, label, adder_data, _frame);
             ui.separator();
