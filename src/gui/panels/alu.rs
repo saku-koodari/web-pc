@@ -72,8 +72,7 @@ pub fn panel_alu(
 
     if ui.button("Run").clicked() {
         println!("CLICK");
-        let result = from_string_integer(data.input_x.clone())
-            .and_then(|a| {
+        let result = from_string_integer(data.input_x.clone()).and_then(|a| {
             from_string_integer(data.input_y.clone()).map(|b| (a.as_array_b16, b.as_array_b16))
         });
 
