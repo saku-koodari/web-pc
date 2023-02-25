@@ -13,7 +13,6 @@ use crate::{
 use super::adder::inc16;
 
 // the truth table for the ALU
-
 // +----+-----------------------------------+-----+
 // |    |            control bits           | out |
 // +----+-----------------------------------+-----+
@@ -41,89 +40,13 @@ use super::adder::inc16;
 // | 18 |  0  |  1  |  0  |  1  |  0  |  1  | y|y |    | 010101 =    15   | YOrY      | out[16]	1111101111101111 zr	0 ng	1
 // |----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+------------------+-- +---+
 
-fn print_bin(prefix: &str, output: [bool; 16]) {
-    let res = convert_16b::from_b16(output);
-    match res {
-        Ok(res) => println!("{}{}", prefix, res),
-        Err(e) => println!("CANNOT PRINT BOOL: {}", e),
-    }
-}
-
 fn zero_negator(input: [bool; 16], zero: bool, negate: bool) -> [bool; 16] {
-    let input_b = [false; 16];
-    let z_res = mux16(input, input_b, zero);
-    let res = mux16(z_res, not16(z_res), negate);
-
-    // debug
-    let c_res = convert_16b::from_b16(input).unwrap().as_string_bin;
-    println!(" - zero_negator(input: {c_res}, zero:{zero}, negate:{negate})");
-
-    let c_z_res = convert_16b::from_b16(z_res).unwrap().as_string_bin;
-    println!(" - zeroing result: {c_z_res}");
-
-    let c_n_res = convert_16b::from_b16(res).unwrap();
-    println!(" - - negationing result: {}", c_n_res.as_string_bin);
-    println!(
-        "returning: [int:{}, hex:{}, bin:{}]",
-        c_n_res.as_integer, c_n_res.as_string_hex, c_n_res.as_string_bin
-    );
-    print!("\n");
-
-    res
+    let z_res = mux16(input,  [false; 16], zero);
+    mux16(z_res, not16(z_res), negate)
 }
 
 fn func(input_a: [bool; 16], input_b: [bool; 16], func: bool) -> [bool; 16] {
-    let and_res = and16(input_a, input_b);
-    let adder_res = adder_b16(input_a, input_b);
-
-    let res = mux16(and_res, adder_res, func);
-
-    // debug
-    let c_input_a = convert_16b::from_b16(input_a).unwrap();
-    let c_input_b = convert_16b::from_b16(input_b).unwrap();
-    println!(
-        "func(input_a: {}, input_b: {}, func: {})",
-        c_input_a.as_string_bin, c_input_b.as_string_bin, func
-    );
-    println!(
-        " - And result: {}",
-        convert_16b::from_b16(and_res).unwrap().as_string_bin
-    );
-    println!(
-        " - Adder result: {}",
-        convert_16b::from_b16(adder_res).unwrap().as_string_bin
-    );
-    println!(
-        " - returning: {}",
-        convert_16b::from_b16(res).unwrap().as_string_bin
-    );
-    print!("\n");
-
-    res
-}
-
-fn negate(input: [bool; 16]) -> [bool; 16] {
-    not16(input)
-    // let not_res = not16(input);
-    // let res = inc16(not_res);
-
-    // println!(
-    //     "negating the result {}: ",
-    //     convert::from_b16(input).unwrap()
-    // );
-    // println!(" - returning {}: ", convert::from_b16(res).unwrap());
-    // print!("\n");
-
-    // res
-}
-
-fn is_negative(input: [bool; 16]) -> bool {
-    let is_it = input[15];
-    is_it
-}
-
-fn is_zero(input: [bool; 16]) -> bool {
-    not(or16way(input))
+    mux16(and16(input_a, input_b), adder_b16(input_a, input_b), func)
 }
 
 // our ALU can't do multiplication or division
@@ -143,65 +66,17 @@ pub fn alu(
     bool,       // zr: zero result
     bool,       // ng: negative result
 ) {
-    print!("\n");
-    print!("\n");
-    print!("\n");
-    println!("-----------------------");
-    println!("-----------------------");
-    println!("-----------------------");
-    println!("ALU PRINT START");
-    print!("\n");
-    print!("\n");
-    print!("\n");
-
-    println!("INPUT:");
-    println!(" - x: {}", convert_16b::from_b16(x).unwrap().as_string_bin);
-    println!(" - y: {}", convert_16b::from_b16(y).unwrap().as_string_bin);
-    println!(
-        " - {}",
-        crate::utils::convert::alu_opcode_from_bytes(zx, nx, zy, ny, f, no)
-    );
-    print!("\n");
-    print!("\n");
-
     // like with full adder, this chip has a drawback
     // you can't run gates in parallel, because the application has to excecute bits one by one
     // this might cause performance issues.
+    let out_func = func(zero_negator(x, zx, nx), zero_negator(y, zy, ny), f);
+    let out = mux16(out_func, not16(out_func), no);
 
-    println!("zero_negator(x, zx, nx);");
-    let out1 = zero_negator(x, zx, nx);
-
-    println!("zero_negator(y, zy, ny);");
-    let out2 = zero_negator(y, zy, ny);
-
-    let out3 = func(out1, out2, f);
-
-    let out = mux16(out3, negate(out3), no);
-    let ng = is_negative(out);
-    let zr = is_zero(out);
-
-    print!("\n");
-    print!("\n");
-    println!("ALU RETURNS:");
-    println!(
-        " - out: {}",
-        convert_16b::from_b16(out).unwrap().as_string_bin
-    );
-    println!(" - zr: {zr}");
-    println!(" - ng: {ng}");
-
-    print!("\n");
-    print!("\n");
-    print!("\n");
-    println!("ALU PRINT END");
-    println!("-----------------------");
-    println!("-----------------------");
-    println!("-----------------------");
-    print!("\n");
-    print!("\n");
-    print!("\n");
-
-    (out, zr, ng)
+    (
+        out,
+        not(or16way(input)) // zr
+        input[15] // ng
+    )
 }
 
 mod tests {
@@ -218,7 +93,6 @@ mod tests {
 
     // tests are not fully convered, because there are too many cases to test
     // that's why there's an UI to test the ALU
-    // TODO: Make test cases for all opcodes, but using static x and y values (then out can be also static)
     #[test]
     fn test_alu_test_cases_1() {
         use crate::hack_computer::chips::alu::alu;
