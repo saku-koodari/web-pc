@@ -1,4 +1,12 @@
-use crate::hack_computer::{gates::gates_b1::mux, chips::flipflop::dff_unsafe};
+use crate::hack_computer::{
+    chips::flipflop::dff_unsafe,
+    gates::{
+        gates_b1::{mux, or},
+        gates_b16::mux16,
+    },
+};
+
+use super::adder::inc16;
 
 pub fn register_1bit_unsafe(input: bool, load: bool) -> bool {
     // Visual reprensentation of 1-BIT register
@@ -43,4 +51,25 @@ pub fn register_16bit_unsafe(input: [bool; 16], load: bool) -> [bool; 16] {
     out[15] = register_1bit_unsafe(input[15], load);
 
     return out;
+}
+
+// TODO: Verify
+pub fn program_counter_unsafe(input: [bool; 16], load: bool, inc: bool, reset: bool) -> [bool; 16] {
+    let reset_out = mux16(input, [false; 16], reset);
+
+    let load_or_reset = or(load, reset);
+
+    static mut OUT: [bool; 16] = [false; 16];
+    let reg_in = mux16(unsafe { OUT }, reset_out, load_or_reset);
+
+    let reg_load = or(load, reset);
+    let reg_out = register_16bit_unsafe(reg_in, reg_load);
+
+    let inc_out = inc16(reg_out);
+
+    unsafe {
+        OUT = mux16(reg_out, inc_out, inc);
+
+        OUT
+    }
 }
