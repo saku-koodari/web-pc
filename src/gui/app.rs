@@ -1,7 +1,7 @@
 use super::panels::{
-    adder::{panel_adder, AdderData},
     alu::{panel_alu, AluData},
-    not::{panel_not, NotData},
+    // adder::{panel_adder, AdderData},
+    memory_wdr::{panel_memory, MemoryData},
 };
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
@@ -16,13 +16,10 @@ pub struct GuiApp {
     value: f32,
 
     #[serde(skip)]
-    adder_data: AdderData,
+    memory_data: MemoryData,
 
     #[serde(skip)]
     alu_data: AluData,
-
-    #[serde(skip)]
-    not_data: NotData,
 }
 
 impl Default for GuiApp {
@@ -31,9 +28,9 @@ impl Default for GuiApp {
             // Example stuff:
             label: "My virtual PC".to_owned(),
             value: 2.7,
-            adder_data: AdderData::default(),
+            memory_data: MemoryData::default(),
             alu_data: AluData::default(),
-            not_data: NotData::default(),
+            // adder_data: AdderData::default(),
         }
     }
 }
@@ -66,9 +63,9 @@ impl eframe::App for GuiApp {
         let Self {
             label,
             value,
-            adder_data,
+            memory_data,
             alu_data,
-            not_data,
+            // adder_data,
         } = self;
 
         #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
@@ -84,7 +81,13 @@ impl eframe::App for GuiApp {
         });
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
-            ui.heading("foo");
+            // ui.heading("foo");
+
+            // panel_alu(ui, label, alu_data, _frame);
+            // ui.separator();
+
+            // panel_adder(ui, label, adder_data, _frame);
+            // ui.separator();
 
             // this is a slider
             // ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
@@ -107,13 +110,7 @@ impl eframe::App for GuiApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
-
-            ui.heading("eframe template");
-            ui.hyperlink("https://github.com/saku-kaarakainen/web-pc");
-            ui.add(egui::github_link_file!(
-                "https://github.com/saku-kaarakainen/web-pc/blob/main/",
-                "Source code."
-            ));
+            panel_memory(ui, memory_data, _frame);
             egui::warn_if_debug_build(ui);
         });
 

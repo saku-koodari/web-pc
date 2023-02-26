@@ -2,6 +2,5 @@
 // However, it saves time than creating a generic  version.
 // TODO: Add generic way to add gates in the panels.
 
-pub mod adder;
 pub mod alu;
-pub mod not;
+pub mod memory_wdr;

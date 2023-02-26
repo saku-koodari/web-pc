@@ -69,10 +69,7 @@ pub fn mux4way16(
     // s: 1 0 -> c
     // s: 1 1 -> d
 
-    mux16(
-        mux16(a, b, s[0]), 
-        mux16(c, d, s[0]), 
-        s[1])
+    mux16(mux16(a, b, s[0]), mux16(c, d, s[0]), s[1])
 }
 
 pub fn mux8way16(
@@ -94,10 +91,7 @@ pub fn mux8way16(
 }
 
 // NOTE: correct signature
-pub fn demux4way(
-    input: bool,
-    s: [bool; 2],
-) -> (bool, bool, bool, bool) {
+pub fn demux4way(input: bool, s: [bool; 2]) -> (bool, bool, bool, bool) {
     // s: 0 0 -> {in,0,0,0}
     // s: 0 1 -> {0,in,0,0}
     // s: 1 0 -> {0,0,in,0}
@@ -110,12 +104,8 @@ pub fn demux4way(
     (a, b, c, d)
 }
 
-
 // NOTE: correct signature
-pub fn dmux8way(
-    input: bool,
-    s: [bool; 3],
-) -> (bool, bool, bool, bool, bool, bool, bool, bool) {
+pub fn dmux8way(input: bool, s: [bool; 3]) -> (bool, bool, bool, bool, bool, bool, bool, bool) {
     let (abcd, efgh) = demux(input, s[2]);
     let (ab, cd) = demux(abcd, s[1]);
     let (ef, gh) = demux(efgh, s[1]);

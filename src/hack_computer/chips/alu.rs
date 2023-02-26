@@ -41,7 +41,7 @@ use super::adder::inc16;
 // |----+-----+-----+-----+-----+-----+-----+-----+    +--------=---------+-----------+------------------+-- +---+
 
 fn zero_negator(input: [bool; 16], zero: bool, negate: bool) -> [bool; 16] {
-    let z_res = mux16(input,  [false; 16], zero);
+    let z_res = mux16(input, [false; 16], zero);
     mux16(z_res, not16(z_res), negate)
 }
 
@@ -74,8 +74,8 @@ pub fn alu(
 
     (
         out,
-        not(or16way(input)) // zr
-        input[15] // ng
+        not(or16way(out)), // zr
+        out[15],           // ng
     )
 }
 
