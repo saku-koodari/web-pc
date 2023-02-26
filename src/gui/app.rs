@@ -84,16 +84,7 @@ impl eframe::App for GuiApp {
         });
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
-            ui.heading("Tools");
-
-            // panel_alu(/*ctx,*/ ui, label, alu_data, _frame);
-            // ui.separator();
-
-            panel_adder(/*ctx,*/ ui, label, adder_data, _frame);
-            ui.separator();
-
-            panel_not(&ctx, ui, label, not_data, _frame);
-            ui.separator();
+            ui.heading("foo");
 
             // this is a slider
             // ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));

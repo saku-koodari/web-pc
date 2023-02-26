@@ -45,7 +45,7 @@ pub fn panel_not(
         let result = from_string_integer(data.input.clone());
         match result {
             Ok(a) => {
-                let output_b16 = crate::pc::gates::gates_b16::not16(a.as_array_b16);
+                let output_b16 = crate::hack_computer::gates::gates_b16::not16(a.as_array_b16);
 
                 let output = utils::convert_16b::from_b16(output_b16);
                 data.output = output.unwrap().to_string(); // TODO: Do we need to check the error?

@@ -1,4 +1,4 @@
-use crate::pc::gates::gates_b1::{and, or, xor};
+use crate::hack_computer::gates::gates_b1::{and, or, xor};
 
 pub fn half_adder(a: bool, b: bool) -> (bool, bool) {
     (xor(a, b), and(a, b))
@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     fn test_half_adder() {
-        use crate::pc::chips::adder::half_adder;
+        use crate::hack_computer::chips::adder::half_adder;
 
         assert_eq!(half_adder(false, false), (false, false));
         assert_eq!(half_adder(false, true), (true, false));
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_full_adder() {
-        use crate::pc::chips::adder::full_adder;
+        use crate::hack_computer::chips::adder::full_adder;
         assert_eq!(full_adder(false, false, false), (false, false));
         assert_eq!(full_adder(false, false, true), (true, false));
         assert_eq!(full_adder(false, true, false), (true, false));
@@ -90,7 +90,7 @@ mod tests {
     #[test]
     fn test_adder_b16() {
         use crate::{
-            pc::chips::adder::adder_b16,
+            hack_computer::chips::adder::adder_b16,
             utils::convert_16b::{from_b16, from_i16},
         };
 
@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn test_inc16() {
         use crate::{
-            pc::chips::adder::inc16,
+            hack_computer::chips::adder::inc16,
             utils::convert_16b::{from_b16, from_i16},
         };
 
