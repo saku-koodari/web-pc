@@ -4,6 +4,9 @@ I started this project as RUST WASM, in order to learn both, computer architectu
 
 ## Hack Asm - Buil-in symbols
 
+D = Data register
+A = address / data register
+M = the currently selected memory register, M = RAM[A]
 
 
 
@@ -78,7 +81,7 @@ For example, `D + 1`. Check the previous table, find the row, then map the binar
 `D+1 = 011111`
 => `1 1 1 a 0 1 1 1 1 1 d1 d2 d3 j1 j2 j3`
 
-#####
+### symbols
 
 | symbol | value | meaning                           |
 | ------ | ----- | --------------------------------- |
@@ -94,3 +97,25 @@ For example, `D + 1`. Check the previous table, find the row, then map the binar
 | ARG    | 2     | TBA...                            |
 | THIS   | 3     | TBA...                            |
 | THAT   | 4     | TBA...                            |
+
+Consider:
+```asm
+// RAM[5] = 15
+@15
+D=A // use A register A as Data register
+
+@5 
+M=D // select @5 Memory register 
+```
+ 
+ can be written as:
+ ```asm
+ @15
+ D=A
+
+ @R5 // Label R means select from memory register
+ M=D // you could think it as "read address 5 from Ram"
+
+ // note: r != R
+ // at last line, remember to add infinite loop
+ ```
