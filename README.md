@@ -1,6 +1,6 @@
 # Web PC
 
-My attempt to build computer only using binary gates AND, NOT and combination of them.
+My attempt to build computer only using binary gates AND, NOT and combination of them. The PC should follow the architecture of the HACK computer that is represented in nand2tetris.org. My target platform is web assembly, so I might have to do some tricks in order to make it work. The code of PC is written in Rust, but I try to rely as little as possible to rust, but using self created logical gates. There are two binary operations AND (&) and NOT (!). Everything else is built using those functions. Also, the goal of the hack-computer code is not to be as efficient as possible, but rather as HDL compatible as possible. Atleast at this moment. I might later need to optimize code in order to make it run properly on wasm. The GUI is written using egui - library.
 
 Runs on https://saku-kaarakainen.github.io/web-pc/
 
