@@ -4,9 +4,8 @@ I started this project as RUST WASM, in order to learn both, computer architectu
 
 ## Hack Asm - Buil-in symbols
 
-A - address instruction
-C -
-M
+
+
 
 ## Set
 
