@@ -28,12 +28,14 @@ M=D // line 15:
     // Check if the index variable i is less than the number of iterations
     @R1   // line 16: // loads the value stored in RAM[1] into the D register.
     D=M   // line 17: 
+    
     @R2   // line 18: // loads the value stored in RAM[2] into the A register, 
                       // and then loads that value into the D register.
-    
+    A=M    // line xx: // set the value to A-register
+
     // toimii väärin. 
     // lataa A-rekisteriin @2, koska R2
-    D=D-M // line 19  //  subtracts the value stored in RAM[2] from the value stored in RAM[1].
+    D=D-A // line 19  //  subtracts the value stored in RAM[2] from the value stored in RAM[1].
     @END  // line 20
     D;JEQ // line 21
 
