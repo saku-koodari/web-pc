@@ -2,6 +2,10 @@
 
 I started this project as RUST WASM, in order to learn both, computer architecture and Web Assembly with Rust. However, Assembly parts are more efficient to learn using nand2tetris.org course material. Otherwise I would have to spend lot's of time building the emulating environment, writing asm compiler, etc, before moving on with the computer. Once this assembly part is done, then I will plan to go back to writing Rust code. Now it's time for writing some asm.
 
+## Note: 
+
+These are mostly internal notes. The "official" specs can be found from nand2tetris.org. They also have a youtube channel to teach those. These specifications rely on the youtube materials.
+
 ## Hack Asm - Buil-in symbols
 
 D = Data register

@@ -28,6 +28,8 @@ M=D // (line 6) Sets M (memory) to D register (reverse)
 
  // REMEMBER to end your app with an infinite loop
  // in order to prevent appliction to use non-allocated memory
- @9 // (line 9)  
- 0;JMP // (line 10) Jump to line 9, causes infinite loop
+ (END) // ( ) - is a label
+   @END // with labels, you don't need to know the line number.
+   0;JMP // (line 10) Jump to line 9, causes infinite loop
+ 
  
