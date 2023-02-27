@@ -3,6 +3,7 @@
 // for (i=0; i<n; i++) {
 //       arr[i] = -1
 // }
+// // fills -1 to the array
 
     // Suppose that arr=100 and n=10
 
