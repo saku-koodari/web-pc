@@ -8,7 +8,7 @@
     // Suppose that arr=100 and n=10
 
     // arr = 100
-    @100 // variable araay is set at RAM[16]
+    @100 // variable araay is set at RAM[ 16]
     D=A  // and it has value of 100 
     @arr // value 16, because it was compiled by the asm compiler
     M=D
