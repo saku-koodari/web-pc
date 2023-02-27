@@ -5,20 +5,18 @@ I started this project as RUST WASM, in order to learn both, computer architectu
 
 ## Hack Asm - Buil-in symbols
 
-+--------+-------+---------------------+
+
 | symbol | value | meaning             |
-+--------+-------+---------------------+
+|--------|-------|---------------------|
 |   R0   |   0   | Virtual register 0  |
 |   R1   |   1   | Virtual register 1  |
 |   R2   |   2   | Virtual register 2  |
 |  ...   |  ...  |                     |
 |  R15   |  15   | Virtual register 15 |
-| SCREEN | 16384 | base addresse of... |
-|  KBD   | 24576 | ...I/O memory maps. |
+| SCREEN | 16384 | base addresse of I/O memory maps. |
+|  KBD   | 24576 | base addresse of I/O memory maps. |
 |   SP   |   0   |  TBA...             |
 |  LCL   |   1   |  TBA...             |
 |  ARG   |   2   |  TBA...             |
 |  THIS  |   3   |  TBA...             |
 |  THAT  |   4   |  TBA...             |
-+--------+-------+---------------------+
-
