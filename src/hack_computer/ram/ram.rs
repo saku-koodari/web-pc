@@ -348,41 +348,41 @@ impl Ram16k {
         mux4way16(a, b, c, d, [address[12], address[13]])
     }
 }
-// Ram fails because of data race issues.
-// mod test {
-//     use crate::{
-//         hack_computer::parts::ram::ram16k,
-//         utils::{
-//             convert::from_string_unsigned_integer,
-//             convert_16b::{from_b16, from_i16},
-//         },
-//     };
+.
+mod test {
+    use crate::{
+        hack_computer::parts::ram::ram16k,
+        utils::{
+            convert::from_string_unsigned_integer,
+            convert_16b::{from_b16, from_i16},
+        },
+    };
 
-//     #[test]
-//     fn test_ram16k() {
-//         fn addr(str: &str) -> [bool; 14] {
-//             from_string_unsigned_integer::<14>(String::from(str.to_owned()))
-//                 .unwrap()
-//                 .as_array_b_nsize
-//         }
+    #[test]
+    fn test_ram16k() {
+        fn addr(str: &str) -> [bool; 14] {
+            from_string_unsigned_integer::<14>(String::from(str.to_owned()))
+                .unwrap()
+                .as_array_b_nsize
+        }
 
-//         // app created, so ram should be empty
-//         let expect = from_i16(0).unwrap();
-//         let input = from_i16(500).unwrap().as_array_b16;
-//         let load = false;
-//         let address = addr("0");
+        // app created, so ram should be empty
+        let expect = from_i16(0).unwrap();
+        let input = from_i16(500).unwrap().as_array_b16;
+        let load = false;
+        let address = addr("0");
 
-//         // Act
-//         let output = ram16k(input, load, address);
-//         let conv = from_b16(output).unwrap();
+        // Act
+        let output = ram16k(input, load, address);
+        let conv = from_b16(output).unwrap();
 
-//         // Assert
-//         print!("\n");
-//         println!("LEFT = ACTUAL");
-//         println!("RIGHT = EXPECTED");
-//         assert_eq!(conv.to_string(), expect.to_string());
-//     }
-// }
+        // Assert
+        print!("\n");
+        println!("LEFT = ACTUAL");
+        println!("RIGHT = EXPECTED");
+        assert_eq!(conv.to_string(), expect.to_string());
+    }
+}
 
 
 
