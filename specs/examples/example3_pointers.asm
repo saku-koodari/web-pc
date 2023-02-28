@@ -29,7 +29,8 @@
     // if (i==n) goto END
     @i
     D=M
-    D=D-M
+    @n
+    D=M-D
     @END
     D;JEQ
 

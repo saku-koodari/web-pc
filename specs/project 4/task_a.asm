@@ -1,7 +1,12 @@
 // VAL 1
-@6  // line 0: 
-D=A // line 1:
-@0  // line 2:
+@6  // line 0:  // Sets value 6 A register
+D=A // line 1:  // Sets D-register value to ALU D input.
+                // Sets A-register value to ALU M/A input.
+                // calculate operation, A
+                // outputs result to ALU out
+                // sets ALU out to D-register
+
+@0  // line 2:  // Sets value 0 to A register
 M=D // line 3:
 
 // VAL 2
@@ -25,40 +30,27 @@ M=D // line 15:
 
 // Start of loop
 (LOOP)
-    // Check if the index variable i is less than the number of iterations
-    @R1   // line 16: // loads the value stored in RAM[1] into the D register.
-    D=M   // line 17: 
-    
-    @R2   // line 18: // loads the value stored in RAM[2] into the A register, 
-                      // and then loads that value into the D register.
-    A=M    // line xx: // set the value to A-register
+    @R3 // line 16: get index
+    D=M // line 17
 
-    // toimii väärin. 
-    // lataa A-rekisteriin @2, koska R2
-    D=D-A // line 19  //  subtracts the value stored in RAM[2] from the value stored in RAM[1].
-    @END  // line 20
-    D;JEQ // line 21
+    @R1   // line 18: R1 has max value
+    D=D-M // line 19:
+    @END  // line 20:
+    D;JEQ // line 21:
+    
+    @R0
+    D=M
 
     // Body of the loop goes here
     // Add 1 to RAM[1] and store the result back in RAM[1]
-    @1  // line 22
-    D=M     // line 23 
-    @1      // line 24
-    M=D+1   // line 25
+    // point from R2 to M/A input
+    @R2     // line xx // Gets the value of RAM[2], indx should be at M/A
+    D=D+M   // line xx // calculates D+M (7 + res)
+    M=D     // line xx // updates the value to res
 
     // Increment the index variable i
-    @R1     // line 26
-    M=M+1   // line 27
-
-
-    // Perform loop body here
-    @0
-    D=M
-    @2
-    D=D+M
-    @2
-    M=D
-
+    @R3     // line xx
+    M=M+1 
 
     // Jump back to the start of the loop
     @LOOP
@@ -66,5 +58,8 @@ M=D // line 15:
 
 // Endless loop
 (END)
+    @R2
+    D=M
+
     @END
     0;JMP
