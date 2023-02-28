@@ -25,8 +25,7 @@ pub struct GuiApp {
 impl Default for GuiApp {
     fn default() -> Self {
         Self {
-            // Example stuff:
-            label: "My virtual PC".to_owned(),
+            label: "My virtual Hack PC".to_owned(),
             value: 2.7,
             memory_data: MemoryData::default(),
             alu_data: AluData::default(),
