@@ -3,15 +3,16 @@ use crate::hack_computer::gates::gates_b1::{nand, not};
 // This struct is called Circuit because it represents the circuit.
 // When you run SR NAND latch or D Flip Flop, the electric current is trapped in the circuits.
 // To digitally trap the voltage (in the circuit), it's stored in the struct.
-pub struct Circuit {
+#[derive(Clone, Copy)]
+pub struct LatchCircuit {
     // represents the ouputs of SR NAND latch
     prev_q_high: bool,
     prev_q_low: bool,
 }
 
-impl Circuit {
-    pub fn new() -> Circuit {
-        Circuit {
+impl LatchCircuit {
+    pub fn power_on() -> LatchCircuit {
+        LatchCircuit {
             prev_q_high: false,
             prev_q_low: true,
         }
@@ -88,8 +89,8 @@ mod test {
     #[test]
     #[should_panic]
     fn test_sr_nand_latch_wrong_params_panic() {
-        use super::Circuit;
-        let mut circuit = Circuit::new();
+        use super::LatchCircuit;
+        let mut circuit = LatchCircuit::power_on();
 
         circuit.sr_nand_latch(false, false);
     }
@@ -103,8 +104,8 @@ mod test {
             expect_q_low: bool,
         }
 
-        use super::Circuit;
-        let mut circuit = Circuit::new();
+        use super::LatchCircuit;
+        let mut circuit = LatchCircuit::power_on();
 
         let test_cases = vec![
             TestCase {
@@ -149,11 +150,11 @@ mod test {
             expect_out: bool,
         }
 
-        use super::Circuit;
+        use super::LatchCircuit;
 
         // In order to use flip flop, you need to initialize it in the code.
         // This basically happens, turn the power supply of the circuit on.
-        let mut circuit = Circuit::new();
+        let mut circuit = LatchCircuit::power_on();
 
         // Note: this is an integration test
         let test_cases = vec![
