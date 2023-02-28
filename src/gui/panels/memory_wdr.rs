@@ -1,4 +1,5 @@
 use crate::utils::{self, convert::from_string_unsigned_integer, convert_16b::from_string_integer};
+use crate::hack_computer::ram::ram::Ram16k;
 
 pub struct MemoryData {
     // TODO: Is it possible to convert into i16?
@@ -52,8 +53,9 @@ pub fn panel_memory(
 
         match result {
             Ok((input, address)) => {
-                let mem_res =
-                    crate::hack_computer::parts::ram_unsafe::ram16k(input, data.load, address);
+                let mut ram16k = Ram16k::power_on();
+
+                let mem_res = ram16k.ram16k(input, data.load, address);
 
                 let output_i16 = utils::convert_16b::from_b16(mem_res);
                 data.output = output_i16.unwrap().as_integer.to_string(); // TODO: Do we need to check the error?
