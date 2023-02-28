@@ -1,59 +1,202 @@
-use crate::hack_computer::gates::gates_b1::{and, nor, not};
+use crate::hack_computer::gates::gates_b1::{nand, not};
 
-/// Data flip flop. Uses unsafe code to store the NOR_OUT1 and NOR_OUT2 values.
-///
-/// Stores the NOR_OUT1 and NOR_OUT2 values in static variables.
-/// It represents how D-Latches are implemented in hardware.
-///
-/// NOTE: This method is not thread safe
-pub fn dff_unsafe(data: bool, store: bool) -> bool {
-    // Visual reprensentation of the D-latch
-    /// 1-bit
+// This struct is called Circuit because it represents the circuit.
+// When you run SR NAND latch or D Flip Flop, the electric current is trapped in the circuits.
+// To digitally trap the voltage (in the circuit), it's stored in the struct.
+pub struct Circuit {
+    // represents the ouputs of SR NAND latch
+    prev_q_high: bool,
+    prev_q_low: bool,
+}
+
+impl Circuit {
+    pub fn new() -> Circuit {
+        Circuit {
+            prev_q_high: false,
+            prev_q_low: true,
+        }
+    }
+
+    // https://en.wikipedia.org/wiki/Flip-flop_(electronics)
+    /// SR NAND latch
+    ///
+    /// The circuit uses feedback to "remember" and retain its logical state even after the controlling input signals have changed. When the S and R inputs are both high, feedback maintains the Q outputs to the previous state.
+    ///
+    /// However, feedback loop is not possible, so we need to do this differently.
+    /// The difference is that the previous value of Q is stored at circuit struct.
+    ///
+    ///  The truth table:
+    ///
+    /// | set | reset | Q high  |  Q low  |     notes      |
+    /// |-----|-------|---------|---------|----------------|
+    /// |  0  |   0   |    1    |    1    | not allowed    |
+    /// |  0  |   1   |    1    |    0    | Q = 1          |
+    /// |  1  |   0   |    0    |    1    | Q = 0          |
+    /// |  1  |   1   | Q(t-1)+ | Q(t-1)- | Q = previous Q |
+    // -set------------+------+
+    //                 │ NAND ┝ -Q high---┬---
+    //          ┌------+------+           │
+    //          │  ┌----------------------┘
+    //          │  ┃
+    //          └--╂----------------------┐
+    //             └--+------+            |
+    //                │ NAND ┝ -Q low-----┴---
+    // -reset---------+------+
+    pub fn sr_nand_latch(&mut self, set: bool, reset: bool) -> (bool, bool) {
+        // values are initialzied at Circuit::new()
+        // run the circuit
+        if !set && !reset {
+            panic!("Either set or reset must be on in order to make it this circuit run properly.");
+        }
+
+        let q_high = nand(set, self.prev_q_low);
+        let q_low = nand(self.prev_q_high, reset);
+
+        // Q high and low are changed, update.
+        self.prev_q_high = q_high;
+        self.prev_q_low = q_low;
+
+        (self.prev_q_high, self.prev_q_low)
+    }
+
+    /// Digital flip-flop
     // inputs:
     //
-    // data  O---┬---+-----+ +-----+
-    //           ┃           │ AND ┝ -set-------+-----+
-    //           ┃   ┌-------+-----+            │ NOR ┝ -nor_out1-┐
-    //           ┃   │                ┌---------+-----+           │
-    //           ┃   │                │    ┌----------------------┘
-    //           ┃   │                │    ┃
-    //           ┃   │                └----╂----------------------┐
-    //           ┃   │                     └---+-----+            |
-    // store O---╂---┴-------+-----+           │ NOR ┝ -nor_out2--┴-------------- 0 out
-    //           ┃           │ AND ┝ -reset----+-----+
-    //           ┗━ +NOT-----+-----+
+    // data  O---┬---+-----+ +-----+   +-------+
+    //           ┃           │ AND ┝---|       |- Q high
+    //           ┃   ┌-------+-----+   |  SR   |
+    //           ┃   │                 | NAND  |
+    // store O---╂---┴-------+-----+   | LATCH |
+    //           ┃           │ AND ┝---|       |- Q low
+    //           ┗━ +NOT-----+-----+   +-------+
     //
-    // As you can see from the visualization, these variables
-    // are in order to make the cross connection between NOR gates.
+    pub fn digital_flipflop(&mut self, data: bool, store: bool) -> bool {
+        // store can also mean clock
+        let set = nand(data, store);
+        let reset = nand(not(data), store);
 
-    static mut NOR_OUT1: bool = false;
-    static mut NOR_OUT2: bool = false;
+        // Q high and Q low are not needed here, but Q high to return
+        // This also mean that that this function is now stated and requires
+        // Circuit struct
+        let (ret, _) = self.sr_nand_latch(set, reset);
 
-    println!("\n\n");
-    println!("data flip flop - dff(data:{}, store:{})", data, store);
-
-    let set = and(data, store);
-    println!("set: {}", set);
-
-    let reset = and(not(data), store);
-    println!("reset: {}", reset);
-
-    unsafe {
-        println!("UNSAFE START");
-        NOR_OUT1 = nor(NOR_OUT1, reset);
-        println!("UNSAFE NOR_OUT1: {}", NOR_OUT1);
-
-        NOR_OUT2 = nor(NOR_OUT2, set);
-        println!("RETRUN UNSAFE NOR_OUT2: {}\n\n\n", NOR_OUT2);
-        return NOR_OUT2;
+        ret
     }
 }
 
 mod test {
-    use super::*;
+    #[test]
+    #[should_panic]
+    fn test_sr_nand_latch_wrong_params_panic() {
+        use super::Circuit;
+        let mut circuit = Circuit::new();
+
+        circuit.sr_nand_latch(false, false);
+    }
 
     #[test]
-    fn test_d_latch() {
-        //panic!("Not implemented");
+    fn test_sr_nand_latch() {
+        struct TestCase {
+            set: bool,
+            reset: bool,
+            expect_q_high: bool,
+            expect_q_low: bool,
+        }
+
+        use super::Circuit;
+        let mut circuit = Circuit::new();
+
+        let test_cases = vec![
+            TestCase {
+                // note: is not possible, that both Q_HIGH and Q_LOW mutates at the same time.
+                // atleast that's how this is expected to behave.
+                // Reason: buld the gate and try to switch both at the same time.
+                set: true,
+                reset: false,
+                expect_q_high: false,
+                expect_q_low: true,
+            },
+            TestCase {
+                set: false,
+                reset: true,
+                expect_q_high: true, // this should never happen???
+                expect_q_low: true,
+            },
+            TestCase {
+                set: true,
+                reset: true,
+                expect_q_high: false,
+                expect_q_low: false,
+            },
+        ];
+
+        let mut i = 0;
+        for test in test_cases {
+            println!("Test case: {}", i);
+            i += 1;
+
+            let (q_high, q_low) = circuit.sr_nand_latch(test.set, test.reset);
+            assert_eq!(q_high, test.expect_q_high);
+            assert_eq!(q_low, test.expect_q_low);
+        }
+    }
+
+    #[test]
+    fn integration_test_digital_flipflop() {
+        struct TestCase {
+            data: bool,
+            store: bool,
+            expect_out: bool,
+        }
+
+        use super::Circuit;
+
+        // In order to use flip flop, you need to initialize it in the code.
+        // This basically happens, turn the power supply of the circuit on.
+        let mut circuit = Circuit::new();
+
+        // Note: this is an integration test
+        let test_cases = vec![
+            TestCase {
+                data: false,
+                store: false,
+                expect_out: false,
+            },
+            TestCase {
+                data: false,
+                store: true,
+                expect_out: false,
+            },
+            TestCase {
+                data: true,
+                store: false,
+                expect_out: false,
+            },
+            TestCase {
+                data: true,
+                store: true,
+                expect_out: true,
+            },
+        ];
+
+        println!("\n\n\n\n\n\n\nLET'S RUN THE TESTS!\n\n");
+        for case in test_cases {
+            for i in 0..1 {
+                let expected_out = case.expect_out;
+                let data = case.data;
+                let store = case.store;
+
+                // Let's also simulate,
+                // that user most likely can't press buttons at the speed of light.
+                // The circuit receives the same event several times.
+                let actual_out = circuit.digital_flipflop(data, store);
+
+                println!("circuit Q high: {}", circuit.prev_q_high);
+                println!("circuit Q low: {}", circuit.prev_q_low);
+
+                println!("round {i}: digital_flipflop(data:{data}, store:{store}) -> actual:{actual_out}, expected:{expected_out}\n");
+                assert_eq!(actual_out, case.expect_out);
+            }
+        }
     }
 }
