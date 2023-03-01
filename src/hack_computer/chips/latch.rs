@@ -1,4 +1,7 @@
-use crate::{hack_computer::gates::gates_b1::{nand, not}, utils::convert::b2n};
+use crate::{
+    hack_computer::gates::gates_b1::{nand, not},
+    utils::convert::b2n,
+};
 
 // This struct is called Circuit because it represents the circuit.
 // When you run SR NAND latch or D Flip Flop, the electric current is trapped in the circuits.
