@@ -1,9 +1,6 @@
 use crate::hack_computer::{
-    chips::{flipflop::LatchCircuit, adder::inc16},
-    gates::{
-        gates_b1::{mux, or},
-        gates_b16::mux16,
-    },
+    chips::adder::inc16,
+    gates::{gates_b1::or, gates_b16::mux16},
 };
 
 use super::register_16bit::Register16Bit;

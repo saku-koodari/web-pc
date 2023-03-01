@@ -1,15 +1,15 @@
-use crate::hack_computer::{chips::flipflop::LatchCircuit, gates::gates_b1::mux};
+use crate::hack_computer::{chips::latch::Latch, gates::gates_b1::mux};
 
 #[derive(Clone, Copy)]
 pub struct Register1Bit {
-    child_circuit: LatchCircuit,
+    child_circuit: Latch,
     feedback_out: bool,
 }
 
 impl Register1Bit {
     pub fn power_on() -> Self {
         Self {
-            child_circuit: LatchCircuit::power_on(),
+            child_circuit: Latch::power_on(),
             feedback_out: false,
         }
     }
