@@ -221,9 +221,10 @@ mod tests {
         //     crate::utils::convert_16b::from_i16(i).unwrap().as_array_b16
         // }
         fn bin_str_to_b16(s: String) -> [bool; 16] {
-            crate::utils::convert_16b::from_string_binary(s).unwrap().as_array_b16
+            crate::utils::convert_16b::from_string_binary(s)
+                .unwrap()
+                .as_array_b16
         }
-
 
         #[derive(Debug)]
         struct AluTestCase {
