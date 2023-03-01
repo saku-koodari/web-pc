@@ -37,7 +37,7 @@ pub fn panel_memory(
     _frame: &mut eframe::Frame,
 ) {
     ui.label("16-Bit register");
-    /*
+
     ui.horizontal(|ui| ui.checkbox(&mut data.store, "store bit"));
     ui.horizontal(|ui| ui.checkbox(&mut data.clock_pulse, "clock puse"));
 
@@ -63,9 +63,15 @@ pub fn panel_memory(
     }
 
     ui.horizontal(|ui| {
+        // output_out: String,
+        ui.label("output");
+        ui.label(data.output.clone());
+    });
+
+    ui.horizontal(|ui| {
         if data.error != "" {
             ui.label("Error!:");
             ui.add(egui::widgets::Label::new(format!("{}", data.error)));
         }
-    });*/
+    });
 }
