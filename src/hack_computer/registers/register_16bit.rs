@@ -1,11 +1,11 @@
 use super::register_1bit::Register1Bit;
 
-#[derive(Clone, Copy)]
 pub struct Register16Bit {
     child_circuits: [Register1Bit; 16],
     feedback_out: [bool; 16],
 }
 
+/*
 impl Register16Bit {
     pub fn power_on() -> Self {
         Self {
@@ -35,3 +35,4 @@ impl Register16Bit {
         return self.feedback_out;
     }
 }
+*/

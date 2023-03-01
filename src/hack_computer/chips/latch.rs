@@ -1,13 +1,12 @@
-use crate::hack_computer::gates::gates_b1::{nand, not};
+use crate::{hack_computer::gates::gates_b1::{nand, not}, utils::convert::b2n};
 
 // This struct is called Circuit because it represents the circuit.
 // When you run SR NAND latch or D Flip Flop, the electric current is trapped in the circuits.
 // To digitally trap the voltage (in the circuit), it's stored in the struct.
-#[derive(Clone, Copy)]
 pub struct Latch {
     // represents the ouputs of SR NAND latch
-    prev_q_high: bool,
-    prev_q_low: bool,
+    pub prev_q_high: bool,
+    pub prev_q_low: bool,
 }
 
 impl Latch {
@@ -188,7 +187,7 @@ mod test {
                 // Let's also simulate,
                 // that user most likely can't press buttons at the speed of light.
                 // The circuit receives the same event several times.
-                let (actual_out,_) = circuit.d_latch(data, store);
+                let (actual_out, _) = circuit.d_latch(data, store);
 
                 println!("circuit Q high: {}", circuit.prev_q_high);
                 println!("circuit Q low: {}", circuit.prev_q_low);

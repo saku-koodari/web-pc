@@ -80,6 +80,15 @@ pub fn b_nsize_to_byte_string<const N: usize>(b_nsize: [bool; N]) -> String {
     result
 }
 
+/// Converts a boolean value to 1 if true or 0 if false.
+pub fn b2n(i: bool) -> &'static str {
+    if i {
+        "1"
+    } else {
+        "0"
+    }
+}
+
 mod test {
     #[test]
     fn test_from_string_unsigned_integer() {

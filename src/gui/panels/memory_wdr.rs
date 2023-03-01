@@ -1,7 +1,4 @@
-use crate::{
-    hack_computer::ram::ram::Ram16k,
-    utils::{self, convert::from_string_unsigned_integer, convert_16b::from_string_integer},
-};
+use crate::utils::{self, convert::from_string_unsigned_integer, convert_16b::from_string_integer};
 
 pub struct MemoryData {
     // TODO: Is it possible to convert into i16?
@@ -11,7 +8,7 @@ pub struct MemoryData {
     output: String,
 
     error: String,
-    ram: Ram16k,
+    // ram: Ram16k,
 }
 
 impl Default for MemoryData {
@@ -22,7 +19,7 @@ impl Default for MemoryData {
             load: false,
             output: "0".to_owned(),
             error: "".to_owned(),
-            ram: Ram16k::power_on(),
+            // ram: Ram16k::power_on(),
         }
     }
 }
@@ -57,12 +54,12 @@ pub fn panel_memory(
 
         match result {
             Ok((input, address)) => {
-                let mut ram16k = Ram16k::power_on();
-
-                let mem_res = ram16k.ram16k(input, data.load, address);
-
-                let output_i16 = utils::convert_16b::from_b16(mem_res);
-                data.output = output_i16.unwrap().as_integer.to_string(); // TODO: Do we need to check the error?
+                //let mut ram16k = Ram16k::power_on();
+                //
+                //let mem_res = ram16k.ram16k(input, data.load, address);
+                //
+                //let output_i16 = utils::convert_16b::from_b16(mem_res);
+                //data.output = output_i16.unwrap().as_integer.to_string(); // TODO: Do we need to check the error?
             }
             Err(e) => {
                 data.error = "ERROR: ".to_owned() + &e;

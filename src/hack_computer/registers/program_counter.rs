@@ -5,12 +5,11 @@ use crate::hack_computer::{
 
 use super::register_16bit::Register16Bit;
 
-#[derive(Clone, Copy)]
 pub struct ProgramCounter {
     base_circuit: Register16Bit,
     feedback_out: [bool; 16],
 }
-
+/*
 impl ProgramCounter {
     pub fn power_on() -> Self {
         Self {
@@ -39,3 +38,4 @@ impl ProgramCounter {
         self.feedback_out
     }
 }
+*/
