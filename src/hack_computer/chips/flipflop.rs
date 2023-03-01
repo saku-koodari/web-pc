@@ -60,7 +60,7 @@ impl LatchCircuit {
         (self.prev_q_high, self.prev_q_low)
     }
 
-    /// Digital flip-flop
+    /// Digital latch
     // inputs:
     //
     // data  O---┬---+-----+ +-----+   +-------+
@@ -71,7 +71,7 @@ impl LatchCircuit {
     //           ┃           │ AND ┝---|       |- Q low
     //           ┗━ +NOT-----+-----+   +-------+
     //
-    pub fn digital_flipflop(&mut self, data: bool, store: bool) -> bool {
+    pub fn d_latch(&mut self, data: bool, store: bool) -> (bool, bool) {
         // store can also mean clock
         let set = nand(data, store);
         let reset = nand(not(data), store);
@@ -79,9 +79,7 @@ impl LatchCircuit {
         // Q high and Q low are not needed here, but Q high to return
         // This also mean that that this function is now stated and requires
         // Circuit struct
-        let (ret, _) = self.sr_nand_latch(set, reset);
-
-        ret
+        self.sr_nand_latch(set, reset)
     }
 }
 
@@ -190,7 +188,7 @@ mod test {
                 // Let's also simulate,
                 // that user most likely can't press buttons at the speed of light.
                 // The circuit receives the same event several times.
-                let actual_out = circuit.digital_flipflop(data, store);
+                let (actual_out,_) = circuit.d_latch(data, store);
 
                 println!("circuit Q high: {}", circuit.prev_q_high);
                 println!("circuit Q low: {}", circuit.prev_q_low);

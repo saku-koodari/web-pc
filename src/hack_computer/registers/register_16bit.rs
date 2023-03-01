@@ -9,7 +9,7 @@ pub struct Register16Bit {
 impl Register16Bit {
     pub fn power_on() -> Self {
         Self {
-            child_circuits: [Register1Bit::power_on().clone(); 16],
+            child_circuits: [Register1Bit::power_on(); 16],
             feedback_out: [false; 16],
         }
     }

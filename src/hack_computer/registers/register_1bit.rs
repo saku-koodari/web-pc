@@ -10,7 +10,7 @@ impl Register1Bit {
     pub fn power_on() -> Self {
         Self {
             child_circuit: LatchCircuit::power_on(),
-            feedback_out: false, 
+            feedback_out: false,
         }
     }
 
@@ -28,7 +28,9 @@ impl Register1Bit {
         // are in order to make connection back to MUX gate from DFF gate.
 
         let mux_out = mux(input, self.feedback_out, load);
-        self.feedback_out = self.child_circuit.digital_flipflop(mux_out, load);
+
+        let (q_high, q_low) = self.child_circuit.d_latch(mux_out, load);
+        self.feedback_out = q_high;
 
         return self.feedback_out;
     }

@@ -1,5 +1,7 @@
-use crate::utils::{self, convert::from_string_unsigned_integer, convert_16b::from_string_integer};
-use crate::hack_computer::ram::ram::Ram16k;
+use crate::{
+    hack_computer::ram::ram::Ram16k,
+    utils::{self, convert::from_string_unsigned_integer, convert_16b::from_string_integer},
+};
 
 pub struct MemoryData {
     // TODO: Is it possible to convert into i16?
@@ -9,6 +11,7 @@ pub struct MemoryData {
     output: String,
 
     error: String,
+    ram: Ram16k,
 }
 
 impl Default for MemoryData {
@@ -19,6 +22,7 @@ impl Default for MemoryData {
             load: false,
             output: "0".to_owned(),
             error: "".to_owned(),
+            ram: Ram16k::power_on(),
         }
     }
 }

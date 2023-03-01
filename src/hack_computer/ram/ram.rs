@@ -1,10 +1,10 @@
 use crate::hack_computer::{
     gates::gates_mw::{dmux8way, mux4way16, mux8way16},
-    registers::register_16bit::Register16Bit,
+    registers::{self, register_16bit::Register16Bit, register_1bit::Register1Bit},
 };
 
 // RAM-circuits do not have any feedback loops, so they don't require pointers,
-// the registers do, and therefore they are using pointers as well 
+// the registers do, and therefore they are using pointers as well
 // and furthermore requires memory allocation.
 
 #[derive(Clone, Copy)]
@@ -15,7 +15,7 @@ pub struct Ram8 {
 impl Ram8 {
     pub fn power_on() -> Self {
         Self {
-            child_circuits: [Register16Bit::power_on().clone(); 8],
+            child_circuits: [Register16Bit::power_on(); 8],
         }
     }
 
@@ -46,7 +46,7 @@ pub struct Ram64 {
 impl Ram64 {
     pub fn power_on() -> Self {
         Self {
-            child_parts: [Ram8::power_on().clone(); 8],
+            child_parts: [Ram8::power_on(); 8],
         }
     }
 
@@ -76,7 +76,7 @@ pub struct Ram512 {
 impl Ram512 {
     pub fn power_on() -> Self {
         Self {
-            child_parts: [Ram64::power_on().clone(); 8],
+            child_parts: [Ram64::power_on(); 8],
         }
     }
 
@@ -144,7 +144,6 @@ impl Ram512 {
 
         mux8way16(a, b, c, d, e, f, g, h, [address[6], address[7], address[8]])
     }
-
 }
 
 #[derive(Clone, Copy)]
@@ -155,7 +154,7 @@ pub struct Ram4k {
 impl Ram4k {
     pub fn power_on() -> Self {
         Self {
-            child_parts: [Ram512::power_on().clone(); 8],
+            child_parts: [Ram512::power_on(); 8],
         }
     }
 
@@ -241,7 +240,6 @@ impl Ram4k {
             [address[9], address[10], address[11]],
         )
     }
-
 }
 
 #[derive(Clone, Copy)]
@@ -249,11 +247,10 @@ pub struct Ram16k {
     child_parts: [Ram4k; 4],
 }
 
-
 impl Ram16k {
     pub fn power_on() -> Self {
         Self {
-            child_parts: [Ram4k::power_on().clone(); 4],
+            child_parts: [Ram4k::power_on(); 4],
         }
     }
 
@@ -348,14 +345,11 @@ impl Ram16k {
         mux4way16(a, b, c, d, [address[12], address[13]])
     }
 }
-.
+
 mod test {
-    use crate::{
-        hack_computer::parts::ram::ram16k,
-        utils::{
-            convert::from_string_unsigned_integer,
-            convert_16b::{from_b16, from_i16},
-        },
+    use crate::utils::{
+        convert::from_string_unsigned_integer,
+        convert_16b::{from_b16, from_i16},
     };
 
     #[test]
@@ -367,13 +361,14 @@ mod test {
         }
 
         // app created, so ram should be empty
+        let mut ram16k = super::Ram16k::power_on();
         let expect = from_i16(0).unwrap();
         let input = from_i16(500).unwrap().as_array_b16;
         let load = false;
         let address = addr("0");
 
         // Act
-        let output = ram16k(input, load, address);
+        let output = ram16k.ram16k(input, load, address);
         let conv = from_b16(output).unwrap();
 
         // Assert
@@ -383,28 +378,3 @@ mod test {
         assert_eq!(conv.to_string(), expect.to_string());
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
