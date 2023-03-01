@@ -8,8 +8,27 @@ pub struct Register16Bit {
 /*
 impl Register16Bit {
     pub fn power_on() -> Self {
+        // I need to loop this 16 times
+        let one_bit = Register1Bit {
+            child_circuit: Latch {
+                prev_q_high: false,
+                prev_q_low: true,
+            },
+            feedback_out: false,
+            child_circuit_v2: [
+                Latch {
+                    prev_q_high: false,
+                    prev_q_low: true,
+                },
+                Latch {
+                    prev_q_high: false,
+                    prev_q_low: true,
+                },
+            ],
+        };
+
         Self {
-            child_circuits: [Register1Bit::power_on(); 16],
+            child_circuits: [Register1Bit::clone(); 16],
             feedback_out: [false; 16],
         }
     }
@@ -35,4 +54,5 @@ impl Register16Bit {
         return self.feedback_out;
     }
 }
+
 */

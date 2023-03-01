@@ -62,13 +62,13 @@ impl Latch {
     /// Digital latch
     // inputs:
     //
-    // data  O---┬---+-----+ +-----+   +-------+
-    //           ┃           │ AND ┝---|       |- Q high
-    //           ┃   ┌-------+-----+   |  SR   |
+    // data  O---┬----------+------+   +-------+
+    //           ┃          │ NAND ┝---|       |- Q high
+    //           ┃   ┌------+------+   |  SR   |
     //           ┃   │                 | NAND  |
-    // store O---╂---┴-------+-----+   | LATCH |
-    //           ┃           │ AND ┝---|       |- Q low
-    //           ┗━ +NOT-----+-----+   +-------+
+    // store O---╂---┴------+------+   | LATCH |
+    //           ┃          │ NAND ┝---|       |- Q low
+    //           ┗━ +NOT----+------+   +-------+
     //
     pub fn d_latch(&mut self, data: bool, store: bool) -> (bool, bool) {
         // store can also mean clock
