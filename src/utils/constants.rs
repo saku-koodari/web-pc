@@ -107,22 +107,20 @@ pub mod i16_consts {
 // This file has one test to show how bits are represented in the virtual PC.
 // Bits are LSB and signed. Sign bit is always last element in array.
 mod test {
-    use super::*;
-
-    /// prints the bit array in printable format
-    /// the algorithm is the test, therefore this logic is not in the main code.
-    /// if you get unsure about the bit representation, you can rely on this test.
-    fn b2str(b16: [bool; 16]) -> String {
-        let mut s = String::new();
-        for i in (0..16).rev() {
-            s.push(if b16[i] { '1' } else { '0' });
-        }
-
-        s
-    }
-
     #[test]
     fn test_b16_consts() {
+        /// prints the bit array in printable format
+        /// the algorithm is the test, therefore this logic is not in the main code.
+        /// if you get unsure about the bit representation, you can rely on this test.
+        fn b2str(b16: [bool; 16]) -> String {
+            let mut s = String::new();
+            for i in (0..16).rev() {
+                s.push(if b16[i] { '1' } else { '0' });
+            }
+
+            s
+        }
+
         let zero /* -------- */ = "0000000000000000";
         let plus_1 /* ------ */ = "0000000000000001";
         let plus_2 /* ------ */ = "0000000000000010";
@@ -134,14 +132,38 @@ mod test {
         let minus_1 /* ----- */ = "1111111111111111";
 
         // for actual testing
-        assert_eq!(b2str(i16_consts::B16_0), zero);
-        assert_eq!(b2str(i16_consts::B16_PLUS_1), plus_1);
-        assert_eq!(b2str(i16_consts::B16_PLUS_2), plus_2);
-        assert_eq!(b2str(i16_consts::B16_PLUS_21845), plus_21845);
-        assert_eq!(b2str(i16_consts::B16_PLUS_32767), plus_32767);
-        assert_eq!(b2str(i16_consts::B16_MINUS_32768), minus_32768);
-        assert_eq!(b2str(i16_consts::B16_MINUS_21846), minus_21846);
-        assert_eq!(b2str(i16_consts::B16_MINUS_2), minus_2);
-        assert_eq!(b2str(i16_consts::B16_MINUS_1), minus_1);
+        assert_eq!(b2str(crate::utils::constants::i16_consts::B16_0), zero);
+        assert_eq!(
+            b2str(crate::utils::constants::i16_consts::B16_PLUS_1),
+            plus_1
+        );
+        assert_eq!(
+            b2str(crate::utils::constants::i16_consts::B16_PLUS_2),
+            plus_2
+        );
+        assert_eq!(
+            b2str(crate::utils::constants::i16_consts::B16_PLUS_21845),
+            plus_21845
+        );
+        assert_eq!(
+            b2str(crate::utils::constants::i16_consts::B16_PLUS_32767),
+            plus_32767
+        );
+        assert_eq!(
+            b2str(crate::utils::constants::i16_consts::B16_MINUS_32768),
+            minus_32768
+        );
+        assert_eq!(
+            b2str(crate::utils::constants::i16_consts::B16_MINUS_21846),
+            minus_21846
+        );
+        assert_eq!(
+            b2str(crate::utils::constants::i16_consts::B16_MINUS_2),
+            minus_2
+        );
+        assert_eq!(
+            b2str(crate::utils::constants::i16_consts::B16_MINUS_1),
+            minus_1
+        );
     }
 }

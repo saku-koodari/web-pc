@@ -50,7 +50,7 @@ pub fn panel_alu(
     let input_y = &mut data.input_y;
 
     ui.label(label.clone());
-    ui.label("inputs:");
+    ui.label("input:");
 
     ui.horizontal(|ui| {
         ui.label("16-bit int - X:");
