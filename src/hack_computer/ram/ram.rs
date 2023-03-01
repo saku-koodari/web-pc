@@ -381,10 +381,6 @@ impl Ram16k {
     ) -> [bool; 16] {
         let dmux_out = dmux8way(load, [address[11], address[12], address[13]]);
 
-        print!("\n");
-        println!("RAM 16k");
-        println!("MUX OUT: {:?}", dmux_out);
-
         let a = self.child_parts[0].ram4k(
             input,
             dmux_out.0,
@@ -423,6 +419,7 @@ impl Ram16k {
             ],
             clock,
         );
+
         let c = self.child_parts[2].ram4k(
             input,
             dmux_out.2,
@@ -462,12 +459,6 @@ impl Ram16k {
             clock,
         );
 
-        println!("RAM 4k - a: {:?}", a);
-        println!("RAM 4k - b: {:?}", b);
-        println!("RAM 4k - c: {:?}", c);
-        println!("RAM 4k - d: {:?}", d);
-        print!("\n");
-
         mux4way16(a, b, c, d, [address[12], address[13]])
     }
 }
@@ -487,7 +478,7 @@ mod test {
         }
 
         // app created, so ram should be empty
-        let mut ram16k = super::Ram16k::power_on();
+        let mut ram16k = super::Ram4k::power_on();
         let expect = from_i16(0).unwrap();
         let input = from_i16(500).unwrap().as_array_b16;
         let load = false;
@@ -495,7 +486,7 @@ mod test {
         let address = addr("0");
 
         // Act
-        let output = ram16k.ram16k(input, load, address, clock);
+        let output = ram16k.ram4k(input, load, address, clock);
         let conv = from_b16(output).unwrap();
 
         // Assert
