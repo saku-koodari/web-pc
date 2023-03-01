@@ -32,7 +32,7 @@ impl Register16Bit {
         }
     }
 
-    pub fn register_16bit(&mut self, input: [bool; 16], load: bool, clock: bool) -> [bool; 16] {
+    pub fn register_16bit_clocked(&mut self, input: [bool; 16], load: bool, clock: bool) -> [bool; 16] {
         self.feedback_out[0] = self.child_circuits[0].register_1bit_clocked(input[0], load, clock);
         self.feedback_out[1] = self.child_circuits[1].register_1bit_clocked(input[1], load, clock);
         self.feedback_out[2] = self.child_circuits[2].register_1bit_clocked(input[2], load, clock);
@@ -74,11 +74,11 @@ pub mod test {
         ];
         let load = true;
         let mut clock = false;
-        let mut output = register.register_16bit(input, load, clock);
+        let mut output = register.register_16bit_clocked(input, load, clock);
         assert_eq!(output, [false; 16], "tick tock 1");
 
         clock = true;
-        output = register.register_16bit(input, load, clock);
+        output = register.register_16bit_clocked(input, load, clock);
 
         assert_eq!(output, [false; 16], "tick tock 2");
     }
