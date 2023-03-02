@@ -1,8 +1,6 @@
 use crate::{
     hack_computer::registers::register_16bit::Register16Bit,
-    utils::{
-        convert_16b::{from_b16, from_string_integer},
-    },
+    utils::convert_16b::{from_b16, from_string_integer},
 };
 
 pub struct MemoryData {
@@ -47,9 +45,11 @@ pub fn panel_memory(
     let result = from_string_integer(data.input.clone());
     match result {
         Ok(value) => {
-            let output =
-                data.register
-                    .register_16bit_clocked(value.as_array_b16, data.store, data.clock_pulse);
+            let output = data.register.register_16bit_clocked(
+                value.as_array_b16,
+                data.store,
+                data.clock_pulse,
+            );
 
             let cr = from_b16(output);
             let res = cr.unwrap();

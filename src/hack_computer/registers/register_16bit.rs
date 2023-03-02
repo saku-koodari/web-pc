@@ -35,7 +35,7 @@ impl Register16BitEmulated {
             self.value = Self::bn_to_u16(input);
         }
 
-       Self::u16_to_bn_arr(self.value)
+        Self::u16_to_bn_arr(self.value)
     }
 }
 
