@@ -205,17 +205,6 @@ pub fn alu(
 }
 
 mod tests {
-    use crate::utils::convert_16b::{self, from_i16, from_string_binary};
-
-    // unit tests for ALU (arithmatic logic unit)
-    fn i16_to_b16(i: i16) -> [bool; 16] {
-        from_i16(i).unwrap().as_array_b16
-    }
-
-    fn bin_str_to_b16(s: String) -> [bool; 16] {
-        from_string_binary(s).unwrap().as_array_b16
-    }
-
     // tests are not fully convered, because there are too many cases to test
     // that's why there's an UI to test the ALU
     // TODO: Make test cases for all opcodes, but using static x and y values (then out can be also static)
@@ -226,6 +215,16 @@ mod tests {
             convert_16b::from_b16,
             opcodes::{get_opcodes, AluControlBits, Opcode},
         };
+
+        // unit tests for ALU (arithmatic logic unit)
+        // fn i16_to_b16(i: i16) -> [bool; 16] {
+        //     crate::utils::convert_16b::from_i16(i).unwrap().as_array_b16
+        // }
+        fn bin_str_to_b16(s: String) -> [bool; 16] {
+            crate::utils::convert_16b::from_string_binary(s)
+                .unwrap()
+                .as_array_b16
+        }
 
         #[derive(Debug)]
         struct AluTestCase {

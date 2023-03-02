@@ -27,7 +27,7 @@ impl Register1Bit {
     }
 
     // registed is used only, when clock is active
-    pub fn register_1bit_clocked(&mut self, data: bool, clock: bool, store: bool) -> bool {
+    pub fn register_1bit_clocked(&mut self, data: bool, store: bool, clock: bool) -> bool {
         println!(
             "register_1bit_clocked(data: {}, clock: {}, store: {})",
             b2n(data),
@@ -159,7 +159,7 @@ mod test {
                 b2n(test.clock),
                 b2n(test.store)
             );
-            let res = register.register_1bit_clocked(test.data, test.clock, test.store);
+            let res = register.register_1bit_clocked(test.data, test.store, test.clock);
 
             println!(
                 "\nTEST: Expected {}, and got: {}.\n",
