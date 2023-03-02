@@ -1,6 +1,10 @@
 use crate::hack_computer::{
     gates::gates_mw::{dmux8way, mux4way16, mux8way16},
-    registers::{self, register_16bit::Register16Bit, register_1bit::Register1Bit},
+    registers::{
+        self,
+        register_16bit::{Register16Bit, Register16BitEmulated},
+        register_1bit::Register1Bit,
+    },
 };
 
 // RAM-circuits do not have any feedback loops, so they don't require pointers,
@@ -8,21 +12,22 @@ use crate::hack_computer::{
 // and furthermore requires memory allocation.
 
 pub struct Ram8 {
-    child_circuits: [Register16Bit; 8],
+    child_circuits: [Register16BitEmulated; 8],
 }
 
 impl Ram8 {
     pub fn power_on() -> Self {
         Self {
             child_circuits: [
-                Register16Bit::power_on(), // 1
-                Register16Bit::power_on(), // 2
-                Register16Bit::power_on(), // 3
-                Register16Bit::power_on(), // 4
-                Register16Bit::power_on(), // 5
-                Register16Bit::power_on(), // 6
-                Register16Bit::power_on(), // 7
-                Register16Bit::power_on(), // 8
+                // todo: remove emulation
+                Register16BitEmulated::power_on(), // 1
+                Register16BitEmulated::power_on(), // 2
+                Register16BitEmulated::power_on(), // 3
+                Register16BitEmulated::power_on(), // 4
+                Register16BitEmulated::power_on(), // 5
+                Register16BitEmulated::power_on(), // 6
+                Register16BitEmulated::power_on(), // 7
+                Register16BitEmulated::power_on(), // 8
             ],
         }
     }
@@ -478,7 +483,7 @@ mod test {
         }
 
         // app created, so ram should be empty
-        let mut ram16k = super::Ram4k::power_on();
+        let mut ram16k = super::Ram16k::power_on();
         let expect = from_i16(0).unwrap();
         let input = from_i16(500).unwrap().as_array_b16;
         let load = false;
@@ -486,7 +491,7 @@ mod test {
         let address = addr("0");
 
         // Act
-        let output = ram16k.ram4k(input, load, address, clock);
+        let output = ram16k.ram16k(input, load, address, clock);
         let conv = from_b16(output).unwrap();
 
         // Assert

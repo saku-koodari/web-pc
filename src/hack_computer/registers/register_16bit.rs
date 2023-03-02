@@ -1,5 +1,44 @@
 use super::register_1bit::Register1Bit;
 
+pub struct Register16BitEmulated {
+    value: u16,
+}
+
+impl Register16BitEmulated {
+    pub fn power_on() -> Self {
+        Self { value: 0 }
+    }
+
+    fn u16_to_bn_arr<const N: usize>(num: u16) -> [bool; N] {
+        let mut result = [false; N];
+        for i in 0..N {
+            result[15 - i] = (num >> i) & 1 == 1;
+        }
+        result
+    }
+
+    fn bn_to_u16<const N: usize>(arr: [bool; N]) -> u16 {
+        let mut result = 0;
+        for i in 0..N {
+            result |= (arr[(N - 1) - i] as u16) << i;
+        }
+        result
+    }
+
+    pub fn register_16bit_clocked(
+        &mut self,
+        input: [bool; 16],
+        load: bool,
+        clock: bool,
+    ) -> [bool; 16] {
+        if load && clock {
+            self.value = Self::bn_to_u16(input);
+        }
+
+       Self::u16_to_bn_arr(self.value)
+    }
+}
+
 pub struct Register16Bit {
     child_circuits: [Register1Bit; 16],
     feedback_out: [bool; 16],
@@ -32,7 +71,12 @@ impl Register16Bit {
         }
     }
 
-    pub fn register_16bit_clocked(&mut self, input: [bool; 16], load: bool, clock: bool) -> [bool; 16] {
+    pub fn register_16bit_clocked(
+        &mut self,
+        input: [bool; 16],
+        load: bool,
+        clock: bool,
+    ) -> [bool; 16] {
         self.feedback_out[0] = self.child_circuits[0].register_1bit_clocked(input[0], load, clock);
         self.feedback_out[1] = self.child_circuits[1].register_1bit_clocked(input[1], load, clock);
         self.feedback_out[2] = self.child_circuits[2].register_1bit_clocked(input[2], load, clock);
