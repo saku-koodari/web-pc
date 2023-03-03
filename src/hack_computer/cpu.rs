@@ -1,4 +1,11 @@
-use super::{chips::alu::alu, gates::{gates_b16::mux16, gates_b1::{not, or, and, nor}}, registers::{register_16bit::Register16Bit, program_counter::ProgramCounter}};
+use super::{
+    chips::alu::alu,
+    gates::{
+        gates_b1::{and, nor, not, or},
+        gates_b16::mux16,
+    },
+    registers::{program_counter::ProgramCounter, register_16bit::Register16Bit},
+};
 
 pub struct Cpu {
     data_out_bus: [bool; 16],
@@ -30,9 +37,9 @@ impl Cpu {
         clock_pulse: bool, // TODO: Some HDL's I saw, does not have this. Could I avoid using this?
     ) -> (
         [bool; 16], // data out bus
-        bool, // write enable
+        bool,       // write enable
         [bool; 15], // data address bus
-        [bool; 15] // instruction address bus
+        [bool; 15], // instruction address bus
     ) {
         // Control bits. These are labels for each control bits
         let cb_j1 = instr_bus[0];
@@ -59,13 +66,17 @@ impl Cpu {
 
         // Register A
         let load_a_reg = or(cb_d1, not_instruction);
-        let reg_a_out = self.a_register.register_16bit_clocked(reg_a_in, load_a_reg, clock_pulse);
+        let reg_a_out = self
+            .a_register
+            .register_16bit_clocked(reg_a_in, load_a_reg, clock_pulse);
 
         let alu_in_y = mux16(reg_a_out, data_bus, cb_d1);
 
         // Register D
         let load_d_reg = and(cb_d2, use_instruction);
-        let alu_in_x = self.d_register.register_16bit_clocked(self.data_out_bus, load_d_reg, clock_pulse);
+        let alu_in_x =
+            self.d_register
+                .register_16bit_clocked(self.data_out_bus, load_d_reg, clock_pulse);
 
         // ALU
         let zx = and(cb_c1, use_instruction);
@@ -94,11 +105,17 @@ impl Cpu {
 
         let jump = and(pc_j123, use_instruction);
 
-        let next_instr = self.program_counter.program_counter_clocked(reg_a_out, jump, self.increment_pc, reset, clock_pulse);
+        let next_instr = self.program_counter.program_counter_clocked(
+            reg_a_out,
+            jump,
+            self.increment_pc,
+            reset,
+            clock_pulse,
+        );
 
         // OUT
         (
-            data_out_bus, 
+            data_out_bus,
             enable_write,
             [
                 // data address bus
@@ -135,7 +152,30 @@ impl Cpu {
                 next_instr[12],
                 next_instr[13],
                 next_instr[14],
-            ]
+            ],
         )
+    }
+}
+
+mod test {
+    #[test]
+    fn test_cpu() {
+        use super::*;
+        let mut cpu = Cpu::power_on();
+
+        let instr_bus = [false; 16];
+        let data_bus = [false; 16];
+        let reset = false;
+        let clock_pulse = false;
+
+        // clock systems are difficult to test due to synchronizing
+        // therefore it's better to test in the UI
+        // and here just verify that the components don't fall in pieces.
+
+        let out = cpu.cpu(instr_bus, data_bus, reset, clock_pulse);
+
+        assert_eq!(out.0, [false; 16]);
+        assert_eq!(out.1, false);
+        assert_eq!(out.2, [false; 15]);
     }
 }
