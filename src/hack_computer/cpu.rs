@@ -96,22 +96,46 @@ impl Cpu {
 
         let next_instr = self.program_counter.program_counter_clocked(reg_a_out, jump, self.increment_pc, reset, clock_pulse);
 
-
-        
-
-        // TODO: PC
-        // https://en.wikipedia.org/wiki/Hack_computer
-
         // OUT
-        // [bool; 16], // data out bus
-        // bool, // write enable
-        // [bool; 16], // data address bus
-        // [bool; 16] // instruction address bus
         (
             data_out_bus, 
             enable_write,
-            m_address, 
-            next_instr
+            [
+                // data address bus
+                reg_a_out[0],
+                reg_a_out[1],
+                reg_a_out[2],
+                reg_a_out[3],
+                reg_a_out[4],
+                reg_a_out[5],
+                reg_a_out[6],
+                reg_a_out[7],
+                reg_a_out[8],
+                reg_a_out[9],
+                reg_a_out[10],
+                reg_a_out[11],
+                reg_a_out[12],
+                reg_a_out[13],
+                reg_a_out[14],
+            ],
+            [
+                // instruction address bus
+                next_instr[0],
+                next_instr[1],
+                next_instr[2],
+                next_instr[3],
+                next_instr[4],
+                next_instr[5],
+                next_instr[6],
+                next_instr[7],
+                next_instr[8],
+                next_instr[9],
+                next_instr[10],
+                next_instr[11],
+                next_instr[12],
+                next_instr[13],
+                next_instr[14],
+            ]
         )
     }
 }
