@@ -359,6 +359,7 @@ impl Ram4k {
     }
 }
 
+/// RAM that fits 16384 words. The RAM is word addressable only.
 pub struct Ram16k {
     child_parts: [Ram4k; 4],
 }

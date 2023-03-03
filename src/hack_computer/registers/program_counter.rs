@@ -17,7 +17,7 @@ impl ProgramCounter {
             feedback_out: [false; 16],
         }
     }
-    pub fn progam_counter(
+    pub fn program_counter_clocked(
         &mut self,
         input: [bool; 16],
         load: bool,
@@ -64,11 +64,11 @@ pub mod test {
         let mut reset = false;
         let mut clock = false;
         let mut clock = false;
-        let mut output = register.progam_counter(input, load, inc, reset, clock);
+        let mut output = register.program_counter_clocked(input, load, inc, reset, clock);
         assert_eq!(output, [false; 16], "tick tock 1");
 
         clock = true;
-        output = register.progam_counter(input, load, inc, reset, clock);
+        output = register.program_counter_clocked(input, load, inc, reset, clock);
 
         assert_eq!(output, [false; 16], "tick tock 2");
     }
