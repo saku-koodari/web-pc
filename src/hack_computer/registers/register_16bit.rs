@@ -1,5 +1,6 @@
 use super::register_1bit::Register1Bit;
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Register16BitEmulated {
     value: u16,
 }
