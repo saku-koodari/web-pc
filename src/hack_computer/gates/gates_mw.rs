@@ -104,7 +104,7 @@ pub fn demux4way(input: bool, s: [bool; 2]) -> (bool, bool, bool, bool) {
     (a, b, c, d)
 }
 
-// NOTE: correct signature
+// TODO: Replace with dmux8wayArray only
 pub fn dmux8way(input: bool, s: [bool; 3]) -> (bool, bool, bool, bool, bool, bool, bool, bool) {
     let (abcd, efgh) = demux(input, s[2]);
     let (ab, cd) = demux(abcd, s[1]);
@@ -118,4 +118,7 @@ pub fn dmux8way(input: bool, s: [bool; 3]) -> (bool, bool, bool, bool, bool, boo
     (a, b, c, d, e, f, g, h)
 }
 
-// TODO: Add tests for the new gates
+pub fn dmux8wayArray(input: bool, s: [bool; 3]) -> [bool; 8] {
+    let (a, b, c, d, e, f, g, h) = dmux8way(input, s);
+    [a, b, c, d, e, f, g, h]
+}
