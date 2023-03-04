@@ -51,6 +51,10 @@ pub fn from_string_unsigned_integer<const N: usize>(
     Ok(from_u64::<N>(as_u64))
 }
 
+pub fn from_string_bytes() {
+    panic!("Not implemented yet");
+}
+
 pub fn from_u64<const N: usize>(int: u64) -> UnsignedConvertResult<N> {
     let as_array_b_nsize = u64_to_b_nsize(int);
     let as_string_bin = b_nsize_to_byte_string(as_array_b_nsize);
@@ -86,6 +90,14 @@ pub fn b2n(i: bool) -> &'static str {
         "1"
     } else {
         "0"
+    }
+}
+
+pub fn n2b(i: &str) -> bool {
+    if i == "1" {
+        true
+    } else {
+        false
     }
 }
 

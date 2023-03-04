@@ -57,12 +57,12 @@ pub mod test {
             true, false, true, false, true, false, true, false, true, false, true, false, true,
             false, true, false,
         ];
-        let load = true;
+        // let load = true;
 
-        let mut load = false;
-        let mut inc = false;
-        let mut reset = false;
-        let mut clock = false;
+        let load = false;
+        let inc = false;
+        let reset = false;
+        // let clock = false;
         let mut clock = false;
         let mut output = register.program_counter_clocked(input, load, inc, reset, clock);
         assert_eq!(output, [false; 16], "tick tock 1");
