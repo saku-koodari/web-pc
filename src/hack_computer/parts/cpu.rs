@@ -1,4 +1,4 @@
-use super::{
+use crate::hack_computer::{
     chips::alu::alu,
     gates::{
         gates_b1::{and, nor, not, or},

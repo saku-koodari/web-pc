@@ -6,7 +6,7 @@ use crate::hack_computer::{
     ram::ram::Ram16k,
 };
 
-use super::drivers::{Screen, Keyboard};
+use super::drivers::{Keyboard, Screen};
 
 pub struct Memory {
     ram: Ram16k,
@@ -29,7 +29,7 @@ impl Memory {
         load: bool,          //
         address: [bool; 15], //
         clock: bool,         //
-    ) -> [bool; 16] {
+    ) -> ([bool; 16], [bool; 16], [bool; 16]) {
         let cb = [address[13], address[14]];
         let (
             load_ram1,     //
@@ -73,12 +73,11 @@ impl Memory {
         ];
 
         let ram_out = self.ram.ram16k(input, load_ram, ram_address, clock);
-        let screen_out = self.screen.screen(input, load_screen, screen_address, clock);
+        let screen_out = self
+            .screen
+            .screen(input, load_screen, screen_address, clock);
         let keyboard_out = self.keyboard.keyboard(input, load, clock); // one word does not require address
-        
-        // TODO: verify if this is correct
-        let out = mux4way16(ram_out, ram_out, screen_out, keyboard_out, cb);
 
-        out
+        (ram_out, screen_out, keyboard_out)
     }
 }

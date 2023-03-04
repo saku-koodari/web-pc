@@ -1,3 +1,4 @@
 pub mod cpu;
-pub mod memory;
 pub mod drivers;
+pub mod memory;
+pub mod rom;
