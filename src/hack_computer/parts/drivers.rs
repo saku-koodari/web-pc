@@ -12,14 +12,14 @@ pub struct Screen {
 }
 
 impl Screen {
-    fn init_data() -> [Register16BitEmulated; 8192] {
-        let mut data: Vec<Register16BitEmulated> = Vec::new();
-        for i in 0..8192 {
-            data.push(Register16BitEmulated::power_on());
-        }
+    // fn init_data() -> [Register16BitEmulated; 8192] {
+    //     let mut data: Vec<Register16BitEmulated> = Vec::new();
+    //     for i in 0..8192 {
+    //         data.push(Register16BitEmulated::power_on());
+    //     }
 
-        data.try_into().unwrap()
-    }
+    //     data.try_into().unwrap()
+    // }
 
     pub fn power_on() -> Self {
         Self {

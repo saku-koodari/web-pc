@@ -72,3 +72,13 @@ impl Computer {
         self.keyboard_in = keyboard_out;
     }
 }
+
+mod test {
+    #[test]
+    fn test_computer() {
+        use super::*;
+        let mut computer = Computer::power_on();
+
+        computer.run();
+    }
+}

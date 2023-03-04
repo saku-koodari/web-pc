@@ -1,11 +1,3 @@
-// Create multi-way gates:
-//   - Or8Way
-//   - Mux4Way16
-//   - Mux8Way16
-//   - DMux4Way
-//   - DMux8Way
-
-use crate::hack_computer::gates::gates_b16::demux16;
 use crate::hack_computer::gates::gates_b16::mux16;
 
 use super::gates_b1::demux;
@@ -118,7 +110,7 @@ pub fn dmux8way(input: bool, s: [bool; 3]) -> (bool, bool, bool, bool, bool, boo
     (a, b, c, d, e, f, g, h)
 }
 
-pub fn dmux8wayArray(input: bool, s: [bool; 3]) -> [bool; 8] {
+pub fn dmux8way_array(input: bool, s: [bool; 3]) -> [bool; 8] {
     let (a, b, c, d, e, f, g, h) = dmux8way(input, s);
     [a, b, c, d, e, f, g, h]
 }
