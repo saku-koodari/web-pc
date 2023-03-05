@@ -1,4 +1,7 @@
-use crate::{emulated_parts::register_16bit_emulated::Register16BitEmulated, hack_computer::gates::gates_mw::{dmux8way, mux8way16}};
+use crate::{
+    emulated_parts::register_16bit_emulated::Register16BitEmulated,
+    hack_computer::gates::gates_mw::{dmux8way, mux8way16},
+};
 
 pub struct Ram8 {
     child_circuits: [Register16BitEmulated; 8],
@@ -45,4 +48,3 @@ impl Ram8 {
         )
     }
 }
-

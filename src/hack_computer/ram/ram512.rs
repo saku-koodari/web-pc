@@ -101,4 +101,3 @@ impl Ram512 {
         mux8way16(a, b, c, d, e, f, g, h, [address[6], address[7], address[8]])
     }
 }
-

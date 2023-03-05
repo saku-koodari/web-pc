@@ -32,10 +32,9 @@ impl Keyboard {
         }
     }
 
-    pub fn write(&mut self, input: [bool; 16], clock: bool){
+    pub fn write(&mut self, input: [bool; 16], clock: bool) {
         self.values = self.register_nbit_clocked::<16>(input, true, clock)
     }
-
 
     /// Register 16 bit
     /// Rwister count: 1
@@ -51,10 +50,9 @@ impl Keyboard {
     ) -> [bool; N] {
         let mut output = [false; N];
         for i in 0..N {
-            output[i] = self.child_circuits[i]
-                .register_1bit_clocked(input[i], load, clock);
+            output[i] = self.child_circuits[i].register_1bit_clocked(input[i], load, clock);
         }
 
-        return output
+        return output;
     }
 }

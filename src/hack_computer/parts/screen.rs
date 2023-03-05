@@ -1,5 +1,5 @@
 use crate::hack_computer::{
-    gates::{gates_b1::not, gates_b16::mux16}, 
+    gates::{gates_b1::not, gates_b16::mux16},
     ram::ram4k::Ram4k,
 };
 
@@ -42,7 +42,7 @@ impl Screen {
     //
     // to turn pixel (row,col) on/off
     // w = Screen[row*32 + col/16]
-    // 
+    //
     // in the hack memory context:
     // w = Memory[16384 + row*32 + col/16]
     //

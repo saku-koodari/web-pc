@@ -1,4 +1,4 @@
-use super::conv::{bn_to_i16, i16_to_bn_arr};
+use crate::utils::convert_bn::from_bool_array;
 
 pub struct Ram16kEmulated {
     values: [i16; 16384],
@@ -6,14 +6,12 @@ pub struct Ram16kEmulated {
 
 impl Ram16kEmulated {
     pub fn power_on() -> Self {
-        Self {
-            values: [0; 16384],
-        }
+        Self { values: [0; 16384] }
     }
 
-    // +--------+------+-------+             
-    // |        |      | child | total            
-    // |  part  | addr | parts | parts            
+    // +--------+------+-------+
+    // |        |      | child | total
+    // |  part  | addr | parts | parts
     // |  name  | size | count | count | 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00 |
     // +--------+------+-------+-------|-------------------------------------------------+
     // |   ram8 |  3   |   8   |     8 | xx xx xx xx xx xx xx xx xx xx xx xx xx 02 01 00 |
@@ -22,8 +20,7 @@ impl Ram16kEmulated {
     // |  ram4k |  12  |   8   |  4096 | xx xx xx xx 11 10 09 -- -- -- -- -- -- -- -- -- |
     // | ram16k |  14  |   4   | 16384 | xx xx 13 12 11 -- -- -- -- -- -- -- -- -- -- -- |
     // +--------+------+-------+-------|-------------------------------------------------+
-    pub fn ram16k_emulated
-    <const N: usize>(
+    pub fn ram16k_emulated<const N: usize>(
         &mut self,
         input: [bool; 16],
         load: bool,
@@ -31,13 +28,14 @@ impl Ram16kEmulated {
         // 64 -> 000
         clock: bool,
     ) -> [bool; 16] {
-        
-        let int_addr = bn_to_i16(address) as usize;
+        let int_addr = from_bool_array(address).ok().unwrap().as_usize;
         if clock && load {
-            self.values[int_addr] = bn_to_i16(input);
+            self.values[int_addr] = from_bool_array(input).ok().unwrap().as_integer;
         }
 
-        i16_to_bn_arr(self.values[int_addr])
+        crate::utils::convert_16b::from_i16(self.values[int_addr])
+            .unwrap()
+            .as_array_b16
     }
 
     pub fn print_ram(&self, start: usize, end: usize) {

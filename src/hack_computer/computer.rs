@@ -20,7 +20,7 @@ pub struct Computer {
 }
 
 impl Computer {
-    pub fn power_on(rom_disk: [i16; 32768]) -> Self {
+    pub fn power_on(rom_disk: Vec<i16>) -> Self {
         Self {
             // power on parts
             cpu: Cpu::power_on(),
@@ -130,24 +130,18 @@ impl Computer {
 }
 
 mod test {
-    fn test_script() -> [i16; 32768] {
+    fn test_script() -> Vec<i16> {
         let code = [
             "6", "-5104", "0", "-7416", "7", "-5104", "1", "-7416", "0", "-5104", "2", "-7416",
             "0", "-5104", "3", "-7416", "3", "-1008", "1", "-2864", "31", "-7422", "0", "-1008",
             "2", "-3952", "-7416", "3", "-568", "16", "-5497", "2", "-1008", "31", "-5497",
         ];
 
-        let mut script: [i16; 32768] = [0; 32768];
-        let mut index = 0;
+        let mut script = Vec::new();
 
         for &str_value in code.iter() {
             let val: i16 = str_value.parse().unwrap_or_default();
-        
-            script[index] = val;
-            index += 1;
-            if index >= script.len() {
-                break;
-            }
+            script.push(val);
         }
 
         script
@@ -163,8 +157,8 @@ mod test {
             println!("cycle: {}", i);
 
             computer.run();
-            computer.print_cpu_debug_info();
-            computer.print_ram(0, 40);
+            // computer.print_cpu_debug_info();
+            // computer.print_ram(0, 40);
         }
 
         panic!("test!")

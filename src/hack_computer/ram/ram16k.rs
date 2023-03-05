@@ -1,19 +1,16 @@
-use crate::{hack_computer::{
-    gates::gates_mw::{dmux8way, mux4way16, mux8way16},
-    registers::{
-        self,
-        register_16bit::Register16Bit,
-        register_1bit::Register1Bit,
+use crate::{
+    emulated_parts::register_16bit_emulated::Register16BitEmulated,
+    hack_computer::{
+        gates::gates_mw::{dmux8way, mux4way16, mux8way16},
+        registers::{self, register_16bit::Register16Bit, register_1bit::Register1Bit},
     },
-}, emulated_parts::register_16bit_emulated::Register16BitEmulated};
+};
 
 use super::ram4k::Ram4k;
 
 // RAM-circuits do not have any feedback loops, so they don't require pointers,
 // the registers do, and therefore they are using pointers as well
 // and furthermore requires memory allocation.
-
-
 
 /// RAM that fits 16384 words. The RAM is word addressable only.
 pub struct Ram16k {

@@ -1,12 +1,15 @@
-use crate::{hack_computer::{
-    gates::{
-        gates_b1::or,
-        gates_mw::{demux4way, mux4way16},
+use crate::{
+    emulated_parts::ram16k_emulated::Ram16kEmulated,
+    hack_computer::{
+        gates::{
+            gates_b1::or,
+            gates_mw::{demux4way, mux4way16},
+        },
+        ram::ram16k::Ram16k,
     },
-    ram::ram16k::Ram16k,
-}, emulated_parts::ram16k_emulated::Ram16kEmulated};
+};
 
-use super::{screen::Screen, keyboard::Keyboard};
+use super::{keyboard::Keyboard, screen::Screen};
 
 pub struct Memory {
     ram: Ram16kEmulated,
@@ -28,7 +31,6 @@ impl Memory {
         self.keyboard.write(input, clock);
     }
 
-
     pub fn memory(
         &mut self,           //
         input: [bool; 16],   //
@@ -38,10 +40,10 @@ impl Memory {
     ) -> [bool; 16] {
         let cb = [address[13], address[14]];
         let (
-            load_ram1,     // ram
-            load_ram2,     // ram
-            load_screen,   // screen
-            _, // keyboard, does not have input
+            load_ram1,   // ram
+            load_ram2,   // ram
+            load_screen, // screen
+            _,           // keyboard, does not have input
         ) = demux4way(load, cb);
         let load_ram = or(load_ram1, load_ram2);
 
@@ -78,7 +80,9 @@ impl Memory {
             address[11],
         ];
 
-        let ram_out = self.ram.ram16k_emulated::<14>(input, load_ram, ram_address, clock);
+        let ram_out = self
+            .ram
+            .ram16k_emulated::<14>(input, load_ram, ram_address, clock);
         let screen_out = self
             .screen
             .screen(input, load_screen, screen_address, clock);
