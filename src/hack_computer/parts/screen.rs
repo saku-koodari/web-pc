@@ -1,7 +1,6 @@
 use crate::hack_computer::{
     gates::{gates_b1::not, gates_b16::mux16},
     ram::ram::Ram4k,
-    registers::register_16bit::{Register16Bit, Register16BitEmulated},
 };
 
 // 8192 words
@@ -29,6 +28,26 @@ impl Screen {
         }
     }
 
+    // https://youtu.be/1_TEVI0YpI0?t=565
+    //
+    // index 0: -> row 0, column 0
+    // index 1: -> row 0, column 1
+    // index  31: -> row 0, column 31
+    // index  32: -> row 1, column 0
+    // index  33: -> row 1, column 1
+    // index  63: -> row 2, column 0
+    // index  8159: -> row 255, column 0
+    // index  8160: -> row 255, column 1
+    // index  8191: -> row 255, column 31
+    //
+    // to turn pixel (row,col) on/off
+    // w = Screen[row*32 + col/16]
+    // 
+    // in the hack memory context:
+    // w = Memory[16384 + row*32 + col/16]
+    //
+    // set col%16 bit of w to 1 or to 0
+
     // TODO: Test
     /// RAM 4K
     /// Rwister count: 4096
@@ -45,24 +64,5 @@ impl Screen {
 
         //mux
         mux16(out1, out2, address[11])
-    }
-}
-
-// 1 word
-pub struct Keyboard {
-    data: Register16Bit,
-}
-
-impl Keyboard {
-    pub fn power_on() -> Self {
-        Self {
-            data: Register16Bit::power_on(),
-        }
-    }
-
-    /// Register 16 bit
-    /// Rwister count: 1
-    pub fn keyboard(&mut self, input: [bool; 16], load: bool, clock: bool) -> [bool; 16] {
-        self.data.register_16bit_clocked(input, load, clock)
     }
 }

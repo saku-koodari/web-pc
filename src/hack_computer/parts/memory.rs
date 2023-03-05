@@ -6,7 +6,7 @@ use crate::hack_computer::{
     ram::ram::Ram16k,
 };
 
-use super::drivers::{Keyboard, Screen};
+use super::{screen::Screen, keyboard::Keyboard};
 
 pub struct Memory {
     ram: Ram16k,
@@ -23,19 +23,25 @@ impl Memory {
         }
     }
 
+    // Input events
+    pub fn write_from_io_driver(&mut self, input: [bool; 16], clock: bool) {
+        self.keyboard.write(input, clock);
+    }
+
+
     pub fn memory(
         &mut self,           //
         input: [bool; 16],   //
         load: bool,          //
         address: [bool; 15], //
         clock: bool,         //
-    ) -> ([bool; 16], [bool; 16], [bool; 16]) {
+    ) -> [bool; 16] {
         let cb = [address[13], address[14]];
         let (
-            load_ram1,     //
-            load_ram2,     //
-            load_screen,   //
-            load_keyboard, //
+            load_ram1,     // ram
+            load_ram2,     // ram
+            load_screen,   // screen
+            _, // keyboard, does not have input
         ) = demux4way(load, cb);
         let load_ram = or(load_ram1, load_ram2);
 
@@ -76,8 +82,8 @@ impl Memory {
         let screen_out = self
             .screen
             .screen(input, load_screen, screen_address, clock);
-        let keyboard_out = self.keyboard.keyboard(input, load, clock); // one word does not require address
+        let keyboard_out = self.keyboard.read(clock); // one word does not require address
 
-        (ram_out, screen_out, keyboard_out)
+        mux4way16(ram_out, ram_out, screen_out, keyboard_out, cb)
     }
 }

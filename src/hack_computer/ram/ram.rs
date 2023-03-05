@@ -1,11 +1,11 @@
-use crate::hack_computer::{
+use crate::{hack_computer::{
     gates::gates_mw::{dmux8way, mux4way16, mux8way16},
     registers::{
         self,
-        register_16bit::{Register16Bit, Register16BitEmulated},
+        register_16bit::Register16Bit,
         register_1bit::Register1Bit,
     },
-};
+}, emulated_parts::register_16bit_emulated::Register16BitEmulated};
 
 // RAM-circuits do not have any feedback loops, so they don't require pointers,
 // the registers do, and therefore they are using pointers as well
