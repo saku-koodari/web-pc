@@ -5,13 +5,13 @@ use crate::hack_computer::{
 
 pub struct Register1Bit {
     child_circuit: [Latch; 2],
-    feedback_out: bool,
+    pub current_value: bool,
 }
 
 impl Register1Bit {
     pub fn power_on() -> Self {
         Self {
-            feedback_out: false,
+            current_value: false,
             child_circuit: [Latch::power_on(), Latch::power_on()],
         }
     }
@@ -26,7 +26,7 @@ impl Register1Bit {
     // registed is used only, when clock is active
     pub fn register_1bit_clocked(&mut self, data: bool, store: bool, clock: bool) -> bool {
         // selects old data or current data, whethe store bit is on.
-        let selected_data = Self::reg_mux(self.feedback_out, store, data);
+        let selected_data = Self::reg_mux(self.current_value, store, data);
 
         // (uninuitive), use not(clock) as store indicator for the first latch
         // you could think this latch as current event,

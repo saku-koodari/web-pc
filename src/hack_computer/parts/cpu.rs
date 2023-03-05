@@ -155,6 +155,14 @@ impl Cpu {
             ],
         )
     }
+
+    pub fn get_debug_info(&mut self) -> ([bool; 16], [bool; 16], [bool; 16]) {
+        (
+            self.a_register.get_debug_info(),
+            self.d_register.get_debug_info(),
+            self.program_counter.get_debug_info(),
+        )
+    }
 }
 
 mod test {

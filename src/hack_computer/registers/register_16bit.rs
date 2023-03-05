@@ -1,6 +1,5 @@
 use super::register_1bit::Register1Bit;
 
-
 pub struct Register16Bit {
     child_circuits: [Register1Bit; 16],
     feedback_out: [bool; 16],
@@ -63,6 +62,15 @@ impl Register16Bit {
             self.child_circuits[15].register_1bit_clocked(input[15], load, clock);
 
         return self.feedback_out;
+    }
+
+    pub fn get_debug_info(&mut self) -> [bool; 16] {
+        let mut res = [false; 16];
+        for i in 0..16 {
+            res[i] = self.child_circuits[i].current_value;
+        }
+
+        res
     }
 }
 

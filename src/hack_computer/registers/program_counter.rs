@@ -40,6 +40,10 @@ impl ProgramCounter {
 
         self.feedback_out
     }
+
+    pub fn get_debug_info(&mut self) -> [bool; 16] {
+        self.base_circuit.get_debug_info()
+    }
 }
 
 // TODO: Write either better tests or panel for this.

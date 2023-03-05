@@ -93,6 +93,10 @@ impl Computer {
             false,
         ];
     }
+
+    pub fn get_cpu_debug_info(&mut self) -> ([bool; 16], [bool; 16], [bool; 16]) {
+        self.cpu.get_debug_info()
+    }
 }
 
 mod test {
