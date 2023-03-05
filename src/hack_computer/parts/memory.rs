@@ -91,7 +91,7 @@ impl Memory {
         mux4way16(ram_out, ram_out, screen_out, keyboard_out, cb)
     }
 
-    pub fn print_ram(&self, start: usize, end: usize) {
-        self.ram.print_ram(start, end)
+    pub fn get_ram(&self, start: usize, end: usize) -> Vec<(usize, i16)> {
+        self.ram.get_ram(start, end)
     }
 }

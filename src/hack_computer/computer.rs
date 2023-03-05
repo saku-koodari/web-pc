@@ -117,15 +117,16 @@ impl Computer {
         )
     }
 
-    pub fn print_cpu_debug_info(&mut self) {
-        let cpu_info = self.get_cpu_debug_info();
-        println!("register A: {}", cpu_info.0);
-        println!("register D: {}", cpu_info.1);
-        println!("register PC: {}", cpu_info.2);
+    pub fn get_ram(&self, start: usize, end: usize) -> Vec<(usize, i16)> {
+        self.memory.get_ram(start, end)
+    }
+
+    pub fn print_cpu_debug_info(&mut self) { 
+        // let cpu_info = self.get_cpu_debug_info();
     }
 
     pub fn print_ram(&mut self, start: usize, end: usize) {
-        self.memory.print_ram(start, end)
+       // self.get_ram(start, end)
     }
 }
 
@@ -157,8 +158,8 @@ mod test {
             println!("cycle: {}", i);
 
             computer.run();
-            // computer.print_cpu_debug_info();
-            // computer.print_ram(0, 40);
+            computer.print_cpu_debug_info();
+            computer.print_ram(0, 40);
         }
 
         panic!("test!")

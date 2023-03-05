@@ -38,14 +38,17 @@ impl Ram16kEmulated {
             .as_array_b16
     }
 
-    pub fn print_ram(&self, start: usize, end: usize) {
+    pub fn get_ram(&self, start: usize, end: usize) -> Vec<(usize, i16)> {
         let mut max = end;
         if max > self.values.len() {
             max = self.values.len();
         }
 
+        let res = Vec::new();
         for i in start..max {
-            println!("{}: {}", i, self.values[i]);
+            res.push((i, self.values[i]));
         }
+
+        res
     }
 }

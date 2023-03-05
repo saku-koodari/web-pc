@@ -57,15 +57,19 @@ impl Cpu {
         let cb_load_reg_a = instr_bus[12];
         // instr_bus[13] not used
         // instr_bus[14] not used
-        let use_instruction = instr_bus[15];
+
+        // if instr[15] == 0 => then instruction is A instruction
+        // the leftover bytes are represented as value stored in register A
+        let is_a_instruction = not(instr_bus[15]);
+
+        // if instr[15] == 1 => then instruction is C instruction
+        let is_c_instruction = instr_bus[15];
 
         // first Part
-        let reg_a_in = mux16(instr_bus, data_bus, use_instruction);
-
-        let not_instruction = not(instr_bus[15]);
+        let reg_a_in = mux16(data_bus, instr_bus, is_c_instruction);
 
         // Register A
-        let load_a_reg = or(cb_d1, not_instruction);
+        let load_a_reg = or(cb_d1, is_a_instruction);
         let reg_a_out = self
             .a_register
             .register_16bit_clocked(reg_a_in, load_a_reg, clock_pulse);
@@ -73,24 +77,24 @@ impl Cpu {
         let alu_in_y = mux16(reg_a_out, data_bus, cb_d1);
 
         // Register D
-        let load_d_reg = and(cb_d2, use_instruction);
+        let load_d_reg = and(cb_d2, is_c_instruction);
         let alu_in_x =
             self.d_register
                 .register_16bit_clocked(self.data_out_bus, load_d_reg, clock_pulse);
 
         // ALU
-        let zx = and(cb_c1, use_instruction);
-        let nx = and(cb_c2, use_instruction);
-        let zy = or(cb_c3, not_instruction);
-        let ny = or(cb_c4, not_instruction);
-        let f = and(cb_c5, use_instruction);
-        let no = and(cb_c6, use_instruction);
+        let zx = and(cb_c1, is_c_instruction);
+        let nx = and(cb_c2, is_c_instruction);
+        let zy = or(cb_c3, is_a_instruction);
+        let ny = or(cb_c4, is_a_instruction);
+        let f = and(cb_c5, is_c_instruction);
+        let no = and(cb_c6, is_c_instruction);
 
         let (data_out_bus, zr, ng) = alu(alu_in_x, alu_in_y, zx, nx, zy, ny, f, no);
         self.data_out_bus = data_out_bus;
 
         // Write enable
-        let enable_write = and(cb_d3, use_instruction);
+        let enable_write = and(cb_d3, is_a_instruction);
 
         // PC
         let pc_pos = nor(zr, ng);
@@ -103,7 +107,7 @@ impl Cpu {
         let pc_j12 = or(pc_j2, pc_j1);
         let pc_j123 = or(pc_j12, pc_j3);
 
-        let jump = and(pc_j123, use_instruction);
+        let jump = and(pc_j123, is_a_instruction);
 
         let next_instr = self.program_counter.program_counter_clocked(
             reg_a_out,
