@@ -121,12 +121,20 @@ impl Computer {
         self.memory.get_ram(start, end)
     }
 
-    pub fn print_cpu_debug_info(&mut self) { 
-        // let cpu_info = self.get_cpu_debug_info();
+    pub fn print_cpu_debug_info(&mut self) {
+        let cpu_info = self.get_cpu_debug_info();
+        println!("A: {}, D: {}, PC: {}", cpu_info.0, cpu_info.1, cpu_info.2);
     }
 
-    pub fn print_ram(&mut self, start: usize, end: usize) {
-       // self.get_ram(start, end)
+    pub fn print_ram(&mut self, start: usize, end: usize, col_count: i32) {
+        let ram_data = self.get_ram(start, end);
+        for (i, (addr, val)) in ram_data.iter().enumerate() {
+            if i % col_count as usize == 0 {
+                println!();
+            }
+            print!("RAM[{:04}]:{:04}    ", addr, val);
+        }
+        println!();
     }
 }
 
@@ -154,12 +162,14 @@ mod test {
         let rom_disk = test_script();
         let mut computer = Computer::power_on(rom_disk);
 
-        for i in 0..35 {
+        for i in 0..5 {
+            println!("\n(cycle print starts)");
             println!("cycle: {}", i);
 
             computer.run();
             computer.print_cpu_debug_info();
-            computer.print_ram(0, 40);
+            computer.print_ram(0, 40, 8);
+            println!("(cycle print ends)\n");
         }
 
         panic!("test!")

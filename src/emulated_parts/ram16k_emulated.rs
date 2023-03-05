@@ -44,7 +44,7 @@ impl Ram16kEmulated {
             max = self.values.len();
         }
 
-        let res = Vec::new();
+        let mut res = Vec::new();
         for i in start..max {
             res.push((i, self.values[i]));
         }

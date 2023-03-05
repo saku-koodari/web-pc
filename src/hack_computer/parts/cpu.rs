@@ -2,7 +2,7 @@ use crate::hack_computer::{
     chips::alu::alu,
     gates::{
         gates_b1::{and, nor, not, or},
-        gates_b16::mux16,
+        gates_b16::{mux16, or16},
     },
     registers::{program_counter::ProgramCounter, register_16bit::Register16Bit},
 };
@@ -12,13 +12,11 @@ pub struct Cpu {
     a_register: Register16Bit,
     d_register: Register16Bit,
     program_counter: ProgramCounter,
-    increment_pc: bool, // this could be used for debugging
 }
 
 impl Cpu {
     pub fn power_on() -> Self {
         Self {
-            increment_pc: true,
             data_out_bus: [false; 16],
             a_register: Register16Bit::power_on(),
             d_register: Register16Bit::power_on(),
@@ -36,128 +34,229 @@ impl Cpu {
         // tick tock
         clock_pulse: bool, // TODO: Some HDL's I saw, does not have this. Could I avoid using this?
     ) -> (
-        [bool; 16], // data out bus
-        bool,       // write enable
-        [bool; 15], // data address bus
-        [bool; 15], // instruction address bus
+        [bool; 16], // data out bus // M - value
+        bool,       // write enable // Should write into M
+        [bool; 15], // (RAM) data address bus // (RAM) M - address
+        [bool; 15], // (ROM) instruction address bus // (ROM) Next instruction
     ) {
         // Control bits. These are labels for each control bits
-        let cb_j1 = instr_bus[0];
-        let cb_j2 = instr_bus[1];
-        let cb_j3 = instr_bus[2];
-        let cb_d3 = instr_bus[3];
-        let cb_d2 = instr_bus[4];
-        let cb_d1 = instr_bus[5];
-        let cb_c6 = instr_bus[6];
-        let cb_c5 = instr_bus[7];
-        let cb_c4 = instr_bus[8];
-        let cb_c3 = instr_bus[9];
-        let cb_c2 = instr_bus[10];
-        let cb_c1 = instr_bus[11];
-        let cb_load_reg_a = instr_bus[12];
-        // instr_bus[13] not used
-        // instr_bus[14] not used
-
+        // # address instruction
         // if instr[15] == 0 => then instruction is A instruction
         // the leftover bytes are represented as value stored in register A
         let is_a_instruction = not(instr_bus[15]);
 
+        // # computation instructions
         // if instr[15] == 1 => then instruction is C instruction
         let is_c_instruction = instr_bus[15];
 
-        // first Part
-        let reg_a_in = mux16(data_bus, instr_bus, is_c_instruction);
+        // ## These are labeled for C instruction
+        let control_bit_x1 = instr_bus[14]; // not used
+        let control_bit_x0 = instr_bus[13]; //not used
+        let control_bit_a = instr_bus[12]; // source for y input of ALU
+        let control_bit_c5 = instr_bus[11]; // 1. ALU operands and computation
+        let control_bit_c4 = instr_bus[10]; // 2. ALU operands and computation
+        let control_bit_c3 = instr_bus[9]; // 3. ALU operands and computation
+        let control_bit_c2 = instr_bus[8]; // 4. ALU operands and computation
+        let control_bit_c1 = instr_bus[7]; // 5. ALU operands and computation
+        let control_bit_c0 = instr_bus[6]; // 6. ALU operands and computation
+        let control_bit_d2 = instr_bus[5]; // 1. destination for ALU output
+        let control_bit_d1 = instr_bus[4]; // 2. destination for ALU output
+        let control_bit_d0 = instr_bus[3]; // 3. destination for ALU output
+        let control_bit_j2 = instr_bus[2]; // 1. jump/branch
+        let control_bit_j1 = instr_bus[1]; // 2. jump/branch
+        let control_bit_j0 = instr_bus[0]; // 3. jump/branch
 
-        // Register A
-        let load_a_reg = or(cb_d1, is_a_instruction);
-        let reg_a_out = self
-            .a_register
-            .register_16bit_clocked(reg_a_in, load_a_reg, clock_pulse);
+        let (data_address_bus_16, data_address_bus_15) = self.run_a_register(
+            data_bus,
+            instr_bus,
+            is_a_instruction,
+            is_c_instruction,
+            control_bit_d2,
+            clock_pulse,
+        );
 
-        let alu_in_y = mux16(reg_a_out, data_bus, cb_d1);
+        let data_out_bus = self.run_d_register(is_c_instruction, control_bit_d1, clock_pulse);
 
-        // Register D
-        let load_d_reg = and(cb_d2, is_c_instruction);
-        let alu_in_x =
-            self.d_register
-                .register_16bit_clocked(self.data_out_bus, load_d_reg, clock_pulse);
+        let (zr, ng) = self.run_alu(
+            data_out_bus,
+            data_address_bus_16,
+            data_bus,
+            control_bit_a,
+            control_bit_c5,
+            control_bit_c4,
+            control_bit_c3,
+            control_bit_c2,
+            control_bit_c1,
+            control_bit_c0,
+        );
 
-        // ALU
-        let zx = and(cb_c1, is_c_instruction);
-        let nx = and(cb_c2, is_c_instruction);
-        let zy = or(cb_c3, is_a_instruction);
-        let ny = or(cb_c4, is_a_instruction);
-        let f = and(cb_c5, is_c_instruction);
-        let no = and(cb_c6, is_c_instruction);
-
-        let (data_out_bus, zr, ng) = alu(alu_in_x, alu_in_y, zx, nx, zy, ny, f, no);
-        self.data_out_bus = data_out_bus;
-
-        // Write enable
-        let enable_write = and(cb_d3, is_a_instruction);
-
-        // PC
-        let pc_pos = nor(zr, ng);
-
-        let pc_j3 = and(cb_j3, pc_pos);
-        let pc_j2 = and(cb_j2, zr);
-        let pc_j1 = and(cb_j1, ng);
-
-        // TODO: This could be optimized. Or could it?
-        let pc_j12 = or(pc_j2, pc_j1);
-        let pc_j123 = or(pc_j12, pc_j3);
-
-        let jump = and(pc_j123, is_a_instruction);
-
-        let next_instr = self.program_counter.program_counter_clocked(
-            reg_a_out,
-            jump,
-            self.increment_pc,
+        // Set bits for PC
+        let next_instr = self.run_pc(
+            data_address_bus_16,
+            is_c_instruction,
+            control_bit_j2,
+            control_bit_j1,
+            control_bit_j0,
+            zr,
+            ng,
             reset,
             clock_pulse,
         );
 
+        // Write enable
+        let write_enable = and(is_c_instruction, control_bit_d0);
+
         // OUT
         (
-            data_out_bus,
-            enable_write,
+            self.data_out_bus,
+            write_enable,
+            data_address_bus_15,
+            next_instr,
+        )
+    }
+
+    fn run_a_register(
+        &mut self,
+        data_bus: [bool; 16],  // data bus
+        instr_bus: [bool; 16], // instruction bus
+
+        is_a_instruction: bool, // control bit
+        is_c_instruction: bool, // control bit
+        control_bit_d2: bool,   // control bit
+        clock_pulse: bool,
+    ) -> ([bool; 16], [bool; 15]) {
+        // Select previous data or current instruction for register A
+        let sel_a = and(is_c_instruction, control_bit_d2);
+        let reg_a_in = mux16(data_bus, instr_bus, sel_a);
+
+        // Register A
+        let load_a = or(is_a_instruction, sel_a);
+        let data_address_bus =
+            self.a_register
+                .register_16bit_clocked(reg_a_in, load_a, clock_pulse);
+
+        (
+            data_address_bus,
             [
-                // data address bus
-                reg_a_out[0],
-                reg_a_out[1],
-                reg_a_out[2],
-                reg_a_out[3],
-                reg_a_out[4],
-                reg_a_out[5],
-                reg_a_out[6],
-                reg_a_out[7],
-                reg_a_out[8],
-                reg_a_out[9],
-                reg_a_out[10],
-                reg_a_out[11],
-                reg_a_out[12],
-                reg_a_out[13],
-                reg_a_out[14],
-            ],
-            [
-                // instruction address bus
-                next_instr[0],
-                next_instr[1],
-                next_instr[2],
-                next_instr[3],
-                next_instr[4],
-                next_instr[5],
-                next_instr[6],
-                next_instr[7],
-                next_instr[8],
-                next_instr[9],
-                next_instr[10],
-                next_instr[11],
-                next_instr[12],
-                next_instr[13],
-                next_instr[14],
+                // pass two data address busses, because 16-bits are for PC and ALU
+                // and 15-bits are for return the instruction address bus
+                data_address_bus[0],
+                data_address_bus[1],
+                data_address_bus[2],
+                data_address_bus[3],
+                data_address_bus[4],
+                data_address_bus[5],
+                data_address_bus[6],
+                data_address_bus[7],
+                data_address_bus[8],
+                data_address_bus[9],
+                data_address_bus[10],
+                data_address_bus[11],
+                data_address_bus[12],
+                data_address_bus[13],
+                data_address_bus[14],
             ],
         )
+    }
+
+    fn run_d_register(
+        &mut self,
+        is_c_instruction: bool, // control bit
+        control_bit_d1: bool,   // control bit
+        clock_pulse: bool,
+    ) -> [bool; 16] {
+        let load_d = and(control_bit_d1, is_c_instruction);
+        self.d_register
+            .register_16bit_clocked(self.data_out_bus, load_d, clock_pulse)
+    }
+
+    fn run_alu(
+        &mut self,
+        data_out_bus: [bool; 16], // data out bus, after modification by D-register
+        data_address_bus: [bool; 16], // data address bus, from A-register
+        data_bus: [bool; 16],     // data bus, from input
+
+        control_bit_a: bool,  // control bit
+        control_bit_c5: bool, // control bit
+        control_bit_c4: bool, // control bit
+        control_bit_c3: bool, // control bit
+        control_bit_c2: bool, // control bit
+        control_bit_c1: bool, // control bit
+        control_bit_c0: bool, // control bit
+    ) -> (bool, bool) {
+        // ALU input y
+        let alu_in_y = mux16(data_address_bus, data_bus, control_bit_a);
+
+        // ALU
+        let (data_out_bus, zr, ng) = alu(
+            data_out_bus,   // 16-bit input x
+            alu_in_y,       // 16-bit input y
+            control_bit_c5, // zero the x input?
+            control_bit_c4, // negate the x input?
+            control_bit_c3, // zero the y input?
+            control_bit_c2, // negate the y input?
+            control_bit_c1, // function selector
+            control_bit_c0, // negate the output?
+        );
+
+        // update the data out bus
+        self.data_out_bus = data_out_bus;
+
+        (zr, ng)
+    }
+
+    fn run_pc(
+        &mut self,
+        data_address_bus: [bool; 16], // data bus
+
+        is_c_instruction: bool, // control bit
+        control_bit_j2: bool,   // control bit
+        control_bit_j1: bool,   // control bit
+        control_bit_j0: bool,   // control bit
+
+        zr: bool, // ALU out zero flag
+        ng: bool, // ALU out negative flag
+
+        reset: bool,       // reset
+        clock_pulse: bool, // clock pulse
+    ) -> [bool; 15] {
+        let zn = or(zr, ng);
+        let is_pos = not(zn);
+
+        let jlt = and(ng, control_bit_j2);
+        let jeq = and(zr, control_bit_j1);
+        let jgt = and(is_pos, control_bit_j0);
+
+        let jle = or(jlt, jeq);
+        let jmp_a = or(jle, jgt);
+        let pc_load = and(is_c_instruction, jmp_a);
+        let inc = not(pc_load);
+
+        let next_instr = self.program_counter.program_counter_clocked(
+            data_address_bus,
+            pc_load,
+            inc,
+            reset,
+            clock_pulse,
+        );
+
+        [
+            next_instr[0],
+            next_instr[1],
+            next_instr[2],
+            next_instr[3],
+            next_instr[4],
+            next_instr[5],
+            next_instr[6],
+            next_instr[7],
+            next_instr[8],
+            next_instr[9],
+            next_instr[10],
+            next_instr[11],
+            next_instr[12],
+            next_instr[13],
+            next_instr[14],
+        ]
     }
 
     pub fn get_debug_info(&mut self) -> ([bool; 16], [bool; 16], [bool; 16]) {
