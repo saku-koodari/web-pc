@@ -1,4 +1,4 @@
-use crate::emulated_parts::rom_emulated::RomEmulated;
+use crate::{emulated_parts::rom_emulated::RomEmulated, utils::convert_16b::from_b16};
 
 use super::parts::{cpu::Cpu, memory::Memory};
 
@@ -94,8 +94,32 @@ impl Computer {
         ];
     }
 
-    pub fn get_cpu_debug_info(&mut self) -> ([bool; 16], [bool; 16], [bool; 16]) {
-        self.cpu.get_debug_info()
+    pub fn get_cpu_debug_info(&mut self) -> (i16, i16, i16) {
+        fn to_i16(debug: &str, val: [bool; 16]) -> i16 {
+            let cr = from_b16(val);
+            match cr {
+                Ok(n) => n.as_integer,
+                Err(e) => {
+                    println!("Error in {}: {}", debug, e);
+                    0
+                }
+            }
+        }
+
+        let cpu_info = self.cpu.get_debug_info();
+
+        (
+            to_i16("A register", cpu_info.0),
+            to_i16("D register", cpu_info.1),
+            to_i16("Program counter", cpu_info.2),
+        )
+    }
+
+    pub fn print_cpu_debug_info(&mut self) {
+        let cpu_info = self.get_cpu_debug_info();
+        println!("register A: {}", cpu_info.0);
+        println!("register D: {}", cpu_info.1);
+        println!("register PC: {}", cpu_info.2);
     }
 }
 
@@ -129,6 +153,13 @@ mod test {
         let rom_disk = test_script();
         let mut computer = Computer::power_on(rom_disk);
 
-        computer.run();
+        for i in 0..35 {
+            println!("cycle: {}", i);
+
+            computer.run();
+            computer.print_cpu_debug_info();
+        }
+
+        panic!("test!")
     }
 }
