@@ -94,6 +94,8 @@ impl Computer {
         ];
     }
 
+    // DEBUG
+
     pub fn get_cpu_debug_info(&mut self) -> (i16, i16, i16) {
         fn to_i16(debug: &str, val: [bool; 16]) -> i16 {
             let cr = from_b16(val);
@@ -120,6 +122,13 @@ impl Computer {
         println!("register A: {}", cpu_info.0);
         println!("register D: {}", cpu_info.1);
         println!("register PC: {}", cpu_info.2);
+    }
+
+    pub fn print_ram(&mut self) {
+        // let ram = self.memory.get_ram();
+        // for i in 0..32768 {
+        //     println!("{}: {}", i, ram[i]);
+        // }
     }
 }
 

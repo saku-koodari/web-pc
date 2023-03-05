@@ -1,6 +1,6 @@
 use crate::hack_computer::{
-    gates::{gates_b1::not, gates_b16::mux16},
-    ram::ram::Ram4k,
+    gates::{gates_b1::not, gates_b16::mux16}, 
+    ram::ram4k::Ram4k,
 };
 
 // 8192 words

@@ -3,7 +3,7 @@ use crate::hack_computer::{
         gates_b1::or,
         gates_mw::{demux4way, mux4way16},
     },
-    ram::ram::Ram16k,
+    ram::ram16k::Ram16k,
 };
 
 use super::{screen::Screen, keyboard::Keyboard};
