@@ -1,16 +1,16 @@
-use crate::hack_computer::{
+use crate::{hack_computer::{
     chips::alu::alu,
     gates::{
         gates_b1::{and, nor, not, or},
         gates_b16::{mux16, or16},
     },
     registers::{program_counter::ProgramCounter, register_16bit::Register16Bit},
-};
+}, emulated_parts::register_16bit_emulated::Register16BitEmulated};
 
 pub struct Cpu {
     data_out_bus: [bool; 16],
-    a_register: Register16Bit,
-    d_register: Register16Bit,
+    a_register: Register16BitEmulated,
+    d_register: Register16BitEmulated,
     program_counter: ProgramCounter,
 }
 
@@ -18,8 +18,8 @@ impl Cpu {
     pub fn power_on() -> Self {
         Self {
             data_out_bus: [false; 16],
-            a_register: Register16Bit::power_on(),
-            d_register: Register16Bit::power_on(),
+            a_register: Register16BitEmulated::power_on(),
+            d_register: Register16BitEmulated::power_on(),
             program_counter: ProgramCounter::power_on(),
         }
     }
@@ -50,8 +50,8 @@ impl Cpu {
         let is_c_instruction = instr_bus[15];
 
         // ## These are labeled for C instruction
-        let control_bit_x1 = instr_bus[14]; // not used
-        let control_bit_x0 = instr_bus[13]; //not used
+        let _control_bit_x1 = instr_bus[14]; // not used
+        let _control_bit_x0 = instr_bus[13]; // not used
         let control_bit_a = instr_bus[12]; // source for y input of ALU
         let control_bit_c5 = instr_bus[11]; // 1. ALU operands and computation
         let control_bit_c4 = instr_bus[10]; // 2. ALU operands and computation
@@ -127,13 +127,13 @@ impl Cpu {
     ) -> ([bool; 16], [bool; 15]) {
         // Select previous data or current instruction for register A
         let sel_a = and(is_c_instruction, control_bit_d2);
-        let reg_a_in = mux16(data_bus, instr_bus, sel_a);
+        let data_or_instr_bus = mux16(data_bus, instr_bus, sel_a);
 
         // Register A
         let load_a = or(is_a_instruction, sel_a);
         let data_address_bus =
             self.a_register
-                .register_16bit_clocked(reg_a_in, load_a, clock_pulse);
+                .register_16bit_clocked(data_or_instr_bus, load_a, clock_pulse);
 
         (
             data_address_bus,

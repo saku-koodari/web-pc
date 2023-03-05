@@ -40,4 +40,9 @@ impl Register16BitEmulated {
 
         from_i16(self.value).unwrap().as_array_b16
     }
+
+    pub fn get_debug_info(&mut self) -> [bool; 16] {
+        from_i16(self.value).unwrap().as_array_b16
+    }
+
 }
