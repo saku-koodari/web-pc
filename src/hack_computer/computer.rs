@@ -20,7 +20,7 @@ pub struct Computer {
 }
 
 impl Computer {
-    pub fn power_on(rom_disk: [u16; 32768]) -> Self {
+    pub fn power_on(rom_disk: [i16; 32768]) -> Self {
         Self {
             // power on parts
             cpu: Cpu::power_on(),
@@ -102,7 +102,7 @@ impl Computer {
             match cr {
                 Ok(n) => n.as_integer,
                 Err(e) => {
-                    println!("Error in {}: {}", debug, e);
+                    println!("val: {:?}, Error in {}: {}", val, debug, e);
                     0
                 }
             }
@@ -124,32 +124,29 @@ impl Computer {
         println!("register PC: {}", cpu_info.2);
     }
 
-    pub fn print_ram(&mut self) {
-        // let ram = self.memory.get_ram();
-        // for i in 0..32768 {
-        //     println!("{}: {}", i, ram[i]);
-        // }
+    pub fn print_ram(&mut self, start: usize, end: usize) {
+        self.memory.print_ram(start, end)
     }
 }
 
 mod test {
-    fn test_script() -> [u16; 32768] {
+    fn test_script() -> [i16; 32768] {
         let code = [
             "6", "-5104", "0", "-7416", "7", "-5104", "1", "-7416", "0", "-5104", "2", "-7416",
             "0", "-5104", "3", "-7416", "3", "-1008", "1", "-2864", "31", "-7422", "0", "-1008",
             "2", "-3952", "-7416", "3", "-568", "16", "-5497", "2", "-1008", "31", "-5497",
         ];
 
-        let mut script: [u16; 32768] = [0; 32768];
-        let mut i = 0;
-        for line in code {
-            let mut line = line.chars().as_str();
-            let mut instruction = [false; 16];
+        let mut script: [i16; 32768] = [0; 32768];
+        let mut index = 0;
 
-            let res = u16::from_str_radix(line, 10);
-            script[i] = match res {
-                Ok(n) => n,
-                Err(_) => 0,
+        for &str_value in code.iter() {
+            let val: i16 = str_value.parse().unwrap_or_default();
+        
+            script[index] = val;
+            index += 1;
+            if index >= script.len() {
+                break;
             }
         }
 
@@ -167,6 +164,7 @@ mod test {
 
             computer.run();
             computer.print_cpu_debug_info();
+            computer.print_ram(0, 40);
         }
 
         panic!("test!")

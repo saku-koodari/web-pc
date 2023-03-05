@@ -19,7 +19,11 @@ impl fmt::Display for ConvertResult {
 }
 
 pub fn from_b16(b16: [bool; 16]) -> Result<ConvertResult, String> {
-    let as_string_bin = b16_to_byte_string(b16);
+    let mut as_string_bin = b16_to_byte_string(b16);
+    if as_string_bin.is_empty() {
+        as_string_bin = String::from("0000000000000000");
+    }
+
     let int32_conversion = i32::from_str_radix(&as_string_bin, 2);
     if int32_conversion.is_err() {
         let error = int32_conversion.err().unwrap();
@@ -81,7 +85,7 @@ pub fn from_string_integer(str: String) -> Result<ConvertResult, String> {
 
 fn b16_to_byte_string(b16: [bool; 16]) -> String {
     let mut result = String::new();
-    for i in (0..16).rev() {
+    for i in 16..0 {
         result.push(if b16[i] { '1' } else { '0' });
     }
     result

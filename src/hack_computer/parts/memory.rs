@@ -1,15 +1,15 @@
-use crate::hack_computer::{
+use crate::{hack_computer::{
     gates::{
         gates_b1::or,
         gates_mw::{demux4way, mux4way16},
     },
     ram::ram16k::Ram16k,
-};
+}, emulated_parts::ram16k_emulated::Ram16kEmulated};
 
 use super::{screen::Screen, keyboard::Keyboard};
 
 pub struct Memory {
-    ram: Ram16k,
+    ram: Ram16kEmulated,
     screen: Screen,
     keyboard: Keyboard,
 }
@@ -17,7 +17,7 @@ pub struct Memory {
 impl Memory {
     pub fn power_on() -> Self {
         Self {
-            ram: Ram16k::power_on(),
+            ram: Ram16kEmulated::power_on(),
             screen: Screen::power_on(),
             keyboard: Keyboard::power_on(),
         }
@@ -78,12 +78,16 @@ impl Memory {
             address[11],
         ];
 
-        let ram_out = self.ram.ram16k(input, load_ram, ram_address, clock);
+        let ram_out = self.ram.ram16k_emulated::<14>(input, load_ram, ram_address, clock);
         let screen_out = self
             .screen
             .screen(input, load_screen, screen_address, clock);
         let keyboard_out = self.keyboard.read(clock); // one word does not require address
 
         mux4way16(ram_out, ram_out, screen_out, keyboard_out, cb)
+    }
+
+    pub fn print_ram(&self, start: usize, end: usize) {
+        self.ram.print_ram(start, end)
     }
 }

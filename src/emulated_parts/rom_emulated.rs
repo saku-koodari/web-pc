@@ -5,14 +5,12 @@ pub struct RomEmulated {
 }
 
 impl RomEmulated {
-    pub fn power_on(disk: [u16; 32768] ) -> Self {
+    pub fn power_on(disk: [i16; 32768]) -> Self {
         let mut registers = [Register16BitEmulated::power_on_with_state(0); 32768];
         for i in 0..32768 {
             registers[i] = Register16BitEmulated::power_on_with_state(disk[i]);
         }
-        Self {
-            registers,
-        }
+        Self { registers }
     }
 
     // receives the instruction address bus
