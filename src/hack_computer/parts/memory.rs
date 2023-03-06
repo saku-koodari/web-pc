@@ -1,15 +1,18 @@
-use crate::hack_computer::{
-    gates::{
-        gates_b1::or,
-        gates_mw::{demux4way, mux4way16},
+use crate::{
+    emulated_parts::ram16k_emulated::Ram16kEmulated,
+    hack_computer::{
+        gates::{
+            gates_b1::or,
+            gates_mw::{demux4way, mux4way16},
+        },
+        ram::ram16k::Ram16k,
     },
-    ram::ram::Ram16k,
 };
 
-use super::drivers::{Keyboard, Screen};
+use super::{keyboard::Keyboard, screen::Screen};
 
 pub struct Memory {
-    ram: Ram16k,
+    ram: Ram16kEmulated,
     screen: Screen,
     keyboard: Keyboard,
 }
@@ -17,10 +20,15 @@ pub struct Memory {
 impl Memory {
     pub fn power_on() -> Self {
         Self {
-            ram: Ram16k::power_on(),
+            ram: Ram16kEmulated::power_on(),
             screen: Screen::power_on(),
             keyboard: Keyboard::power_on(),
         }
+    }
+
+    // Input events
+    pub fn write_from_io_driver(&mut self, input: [bool; 16], clock: bool) {
+        self.keyboard.write(input, clock);
     }
 
     pub fn memory(
@@ -29,13 +37,13 @@ impl Memory {
         load: bool,          //
         address: [bool; 15], //
         clock: bool,         //
-    ) -> ([bool; 16], [bool; 16], [bool; 16]) {
+    ) -> [bool; 16] {
         let cb = [address[13], address[14]];
         let (
-            load_ram1,     //
-            load_ram2,     //
-            load_screen,   //
-            load_keyboard, //
+            load_ram1,   // ram
+            load_ram2,   // ram
+            load_screen, // screen
+            _,           // keyboard, does not have input
         ) = demux4way(load, cb);
         let load_ram = or(load_ram1, load_ram2);
 
@@ -72,12 +80,18 @@ impl Memory {
             address[11],
         ];
 
-        let ram_out = self.ram.ram16k(input, load_ram, ram_address, clock);
+        let ram_out = self
+            .ram
+            .ram16k_emulated::<14>(input, load_ram, ram_address, clock);
         let screen_out = self
             .screen
             .screen(input, load_screen, screen_address, clock);
-        let keyboard_out = self.keyboard.keyboard(input, load, clock); // one word does not require address
+        let keyboard_out = self.keyboard.read(clock); // one word does not require address
 
-        (ram_out, screen_out, keyboard_out)
+        mux4way16(ram_out, ram_out, screen_out, keyboard_out, cb)
+    }
+
+    pub fn get_ram(&self, start: usize, end: usize) -> Vec<(usize, i16)> {
+        self.ram.get_ram(start, end)
     }
 }
