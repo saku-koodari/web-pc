@@ -159,11 +159,13 @@ mod test {
         use super::*;
         let rom_disk = test_script();
         let mut computer = Computer::power_on(rom_disk);
+        let mut cycle = false;
 
-        for i in 0..5 {
+        for i in 0..150 {
             println!("\n(cycle print starts)");
             println!("cycle: {}", i);
 
+            computer.run_clock(false);
             computer.run_clock(true);
 
             computer.print_cpu_debug_info();

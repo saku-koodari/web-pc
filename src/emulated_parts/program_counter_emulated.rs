@@ -6,20 +6,38 @@ use crate::{
     },
 };
 
-use super::register_16bit::Register16Bit;
-
-pub struct ProgramCounter {
+pub struct ProgramCounterEmulated {
     base_circuit: Register16BitEmulated,
     feedback_out: [bool; 16],
 }
 
-impl ProgramCounter {
+impl ProgramCounterEmulated {
     pub fn power_on() -> Self {
         Self {
             base_circuit: Register16BitEmulated::power_on(),
             feedback_out: [false; 16],
         }
     }
+
+    pub fn get_next_val(
+        &mut self,
+        input: [bool; 16],
+        load: bool,
+        inc: bool,
+        reset: bool,
+    ) -> [bool; 16] {
+        // TODO: replace with muxes
+        if reset {
+            [false; 16]
+        } else if load {
+            input
+        } else if inc {
+            inc16(self.feedback_out)
+        } else {
+            self.feedback_out
+        }
+    }
+
     pub fn program_counter_clocked(
         &mut self,
         input: [bool; 16],
@@ -28,22 +46,15 @@ impl ProgramCounter {
         reset: bool, // should emit zero from the register on next cycle
         clock: bool,
     ) -> [bool; 16] {
-        panic!("Fix program counter");
-        // https://stackoverflow.com/questions/15034037/trying-to-build-a-pc-counter-for-the-nand2tetris-book-but-im-having-some-tro
-        // let reset_or = mux16(input, [false; 16], reset);
-        // let load_or_reset = mux4way16();
+        // NOTE: EMULATED
 
-        // let reg_in = mux16(self.feedback_out, input_or_reset, load_or_reset);
+        let reg_in = self.get_next_val(input, load, inc, reset);
 
-        // let reg_load = or(load, reset);
-        // let reg_out = self
-        //     .base_circuit
-        //     .register_16bit_clocked(reg_in, reg_load, clock);
+        self.feedback_out = self
+            .base_circuit
+            .register_16bit_clocked(reg_in, true, clock);
 
-        // let inc_out = inc16(reg_out);
-        // self.feedback_out = mux16(reg_out, inc_out, inc);
-
-        // self.feedback_out
+        self.feedback_out
     }
 
     pub fn get_debug_info(&mut self) -> [bool; 16] {
@@ -60,7 +71,7 @@ pub mod test {
     #[test]
     fn test_register_16bit() {
         // one test is enough, basically just to test  that the struct is initalized correctly
-        let mut register = ProgramCounter::power_on();
+        let mut register = ProgramCounterEmulated::power_on();
 
         let input = [
             true, false, true, false, true, false, true, false, true, false, true, false, true,

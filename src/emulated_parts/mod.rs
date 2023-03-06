@@ -3,3 +3,4 @@
 pub mod ram16k_emulated;
 pub mod register_16bit_emulated;
 pub mod rom_emulated;
+pub mod program_counter_emulated;

@@ -5,8 +5,9 @@ use crate::{hack_computer::{
         gates_b16::{mux16, or16},
     },
     registers::{program_counter::ProgramCounter, register_16bit::Register16Bit},
-}, emulated_parts::register_16bit_emulated::Register16BitEmulated};
+}, emulated_parts::{register_16bit_emulated::Register16BitEmulated, program_counter_emulated::ProgramCounterEmulated}};
 
+// TODO: Replace emulated parts with parts made from gates.
 pub struct Cpu {
     data_out_bus: [bool; 16],
     
@@ -15,7 +16,7 @@ pub struct Cpu {
 
     /// data register
     d_register: Register16BitEmulated,
-    program_counter: ProgramCounter,
+    program_counter: ProgramCounterEmulated,
 }
 
 impl Cpu {
@@ -24,7 +25,7 @@ impl Cpu {
             data_out_bus: [false; 16],
             a_register: Register16BitEmulated::power_on(),
             d_register: Register16BitEmulated::power_on(),
-            program_counter: ProgramCounter::power_on(),
+            program_counter: ProgramCounterEmulated::power_on(),
         }
     }
 
