@@ -9,7 +9,11 @@ use crate::{hack_computer::{
 
 pub struct Cpu {
     data_out_bus: [bool; 16],
+    
+    /// address register
     a_register: Register16BitEmulated,
+
+    /// data register
     d_register: Register16BitEmulated,
     program_counter: ProgramCounter,
 }
@@ -127,7 +131,7 @@ impl Cpu {
     ) -> ([bool; 16], [bool; 15]) {
         // Select previous data or current instruction for register A
         let sel_a = and(is_c_instruction, control_bit_d2);
-        let data_or_instr_bus = mux16(data_bus, instr_bus, sel_a);
+        let data_or_instr_bus = mux16(instr_bus, data_bus, sel_a);
 
         // Register A
         let load_a = or(is_a_instruction, sel_a);

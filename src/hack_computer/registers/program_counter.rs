@@ -1,34 +1,36 @@
-use crate::hack_computer::{
+use crate::{hack_computer::{
     chips::adder::inc16,
-    gates::{gates_b1::or, gates_b16::mux16},
-};
+    gates::{gates_b1::or, gates_b16::mux16, gates_mw::mux4way16},
+}, emulated_parts::register_16bit_emulated::Register16BitEmulated};
 
 use super::register_16bit::Register16Bit;
 
 pub struct ProgramCounter {
-    base_circuit: Register16Bit,
+    base_circuit: Register16BitEmulated,
     feedback_out: [bool; 16],
 }
 
 impl ProgramCounter {
     pub fn power_on() -> Self {
         Self {
-            base_circuit: Register16Bit::power_on(),
+            base_circuit: Register16BitEmulated::power_on(),
             feedback_out: [false; 16],
         }
     }
     pub fn program_counter_clocked(
         &mut self,
         input: [bool; 16],
-        load: bool,
-        inc: bool,
-        reset: bool,
+        load: bool, // should emit input from the register on next cycle
+        inc: bool, // should emit inc16 from the register on next cycle
+        reset: bool, // should emit zero from the register on next cycle
         clock: bool,
     ) -> [bool; 16] {
-        let reset_out = mux16(input, [false; 16], reset);
-        let load_or_reset = or(load, reset);
+        panic!("Fix program counter");
 
-        let reg_in = mux16(self.feedback_out, reset_out, load_or_reset);
+        let reset_or = mux16(input, [false; 16], reset);
+        let load_or_reset  = mux4way16();
+
+        let reg_in = mux16(self.feedback_out, input_or_reset, load_or_reset);
 
         let reg_load = or(load, reset);
         let reg_out = self

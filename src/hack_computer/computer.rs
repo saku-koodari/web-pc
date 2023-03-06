@@ -14,7 +14,6 @@ pub struct Computer {
 
     // events
     pub reset: bool,
-    pub clock: bool,
     pub screen_out: [bool; 16],
     pub keyboard_in: [bool; 16],
 }
@@ -33,7 +32,6 @@ impl Computer {
 
             // initialize events
             reset: false,
-            clock: true,
             screen_out: [false; 16],
             keyboard_in: [false; 16],
         }
@@ -50,7 +48,7 @@ impl Computer {
     // - keyboard in
 
     /// iterates one cyckle of the computer
-    pub fn run(&mut self) {
+    pub fn run_clock(&mut self, clock: bool) {
         // ROM
         let cpu_instr = self.rom.rom(self.instruction_address_bus);
 
@@ -62,14 +60,14 @@ impl Computer {
             instruction_address_bus, //
         ) = self
             .cpu
-            .cpu(cpu_instr, self.cpu_data_bus, self.reset, self.clock);
+            .cpu(cpu_instr, self.cpu_data_bus, self.reset, clock);
 
         // Memory
         let ram_out = self.memory.memory(
             data_out_bus,     //
             write_enable,     //
             data_address_bus, //
-            self.clock,
+            clock,
         );
 
         // update buses / events
@@ -166,7 +164,8 @@ mod test {
             println!("\n(cycle print starts)");
             println!("cycle: {}", i);
 
-            computer.run();
+            computer.run_clock(true);
+
             computer.print_cpu_debug_info();
             computer.print_ram(0, 40, 8);
             println!("(cycle print ends)\n");
