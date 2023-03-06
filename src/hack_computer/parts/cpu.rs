@@ -1,16 +1,22 @@
-use crate::{hack_computer::{
-    chips::alu::alu,
-    gates::{
-        gates_b1::{and, nor, not, or},
-        gates_b16::{mux16, or16},
+use crate::{
+    emulated_parts::{
+        program_counter_emulated::ProgramCounterEmulated,
+        register_16bit_emulated::Register16BitEmulated,
     },
-    registers::{program_counter::ProgramCounter, register_16bit::Register16Bit},
-}, emulated_parts::{register_16bit_emulated::Register16BitEmulated, program_counter_emulated::ProgramCounterEmulated}};
+    hack_computer::{
+        chips::alu::alu,
+        gates::{
+            gates_b1::{and, nor, not, or},
+            gates_b16::{mux16, or16},
+        },
+        registers::{program_counter::ProgramCounter, register_16bit::Register16Bit},
+    },
+};
 
 // TODO: Replace emulated parts with parts made from gates.
 pub struct Cpu {
     data_out_bus: [bool; 16],
-    
+
     /// address register
     a_register: Register16BitEmulated,
 

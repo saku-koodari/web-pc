@@ -64,7 +64,6 @@ pub fn mux4way16(
     mux16(mux16(a, b, s[0]), mux16(c, d, s[0]), s[1])
 }
 
-
 pub fn mux8way16(
     a: [bool; 16],
     b: [bool; 16],
