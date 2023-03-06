@@ -28,22 +28,21 @@ impl ProgramCounter {
         reset: bool, // should emit zero from the register on next cycle
         clock: bool,
     ) -> [bool; 16] {
-        panic!("Fix program counter");
         // https://stackoverflow.com/questions/15034037/trying-to-build-a-pc-counter-for-the-nand2tetris-book-but-im-having-some-tro
-        // let reset_or = mux16(input, [false; 16], reset);
-        // let load_or_reset = mux4way16();
+        let reset_out = mux16(input, [false; 16], reset);
+        let load_or_reset = or(load, reset);
 
-        // let reg_in = mux16(self.feedback_out, input_or_reset, load_or_reset);
+        let reg_in = mux16(self.feedback_out, reset_out, load_or_reset);
 
-        // let reg_load = or(load, reset);
-        // let reg_out = self
-        //     .base_circuit
-        //     .register_16bit_clocked(reg_in, reg_load, clock);
+        let reg_load = or(load, reset);
+        let reg_out = self
+            .base_circuit
+            .register_16bit_clocked(reg_in, reg_load, clock);
 
-        // let inc_out = inc16(reg_out);
-        // self.feedback_out = mux16(reg_out, inc_out, inc);
+        let inc_out = inc16(reg_out);
+        self.feedback_out = mux16(reg_out, inc_out, inc);
 
-        // self.feedback_out
+        self.feedback_out
     }
 
     pub fn get_debug_info(&mut self) -> [bool; 16] {

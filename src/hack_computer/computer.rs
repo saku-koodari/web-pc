@@ -155,24 +155,27 @@ mod test {
     }
 
     #[test]
-    fn test_computer() {
+    fn test_computer_asm6times7() {
         use super::*;
         let rom_disk = test_script();
         let mut computer = Computer::power_on(rom_disk);
         let mut cycle = false;
 
+        // 150 is arbitrary number,
+        // that just mean that the CPU should be able to finish the script in 150 cycles
         for i in 0..150 {
-            println!("\n(cycle print starts)");
-            println!("cycle: {}", i);
+            // println!("\n(cycle print starts)");
+            // println!("cycle: {}", i);
 
             computer.run_clock(false);
             computer.run_clock(true);
 
-            computer.print_cpu_debug_info();
-            computer.print_ram(0, 40, 8);
-            println!("(cycle print ends)\n");
+            // computer.print_cpu_debug_info();
+            // computer.print_ram(0, 40, 8);
+            // println!("(cycle print ends)\n");
         }
 
-        panic!("test!")
+        let reg_d = computer.get_cpu_debug_info().1;
+        assert_eq!(reg_d, 42);
     }
 }
