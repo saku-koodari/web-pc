@@ -138,6 +138,7 @@ impl Computer {
 
 mod test {
     fn test_script() -> Vec<i16> {
+        // assembly script that calculates 6 * 7 into D register
         let code = [
             "6", "-5104", "0", "-7416", "7", "-5104", "1", "-7416", "0", "-5104", "2", "-7416",
             "0", "-5104", "3", "-7416", "3", "-1008", "1", "-2864", "31", "-7422", "0", "-1008",
